@@ -570,17 +570,6 @@ function doLogout() {
 
 /* ─── GAMES ─────────────────────────────────────────────────────────── */
 async function loadGames() {
-try {
-    console.log("Fetching games from:", API + '/api/games');
-    var r = await apiFetch(API + '/api/games', 'GET', null, false);
-    console.log("Games received:", r.games); // Check if this shows in your browser console
-    gamesData = r.games;
-    renderGames();
-  } catch (e) {
-    console.error("Fetch failed:", e);
-    document.getElementById('games-list').innerHTML = '...'; 
-  }
-
   try {
     var r   = await apiFetch(API + '/api/games', 'GET', null, false);
     gamesData = r.games;
@@ -592,32 +581,47 @@ try {
 
 function renderGames() {
   var c = document.getElementById('games-list');
-  
-  // 1. Check if data actually exists
-  if (!gamesData || !Array.isArray(gamesData) || gamesData.length === 0) {
-    c.innerHTML = '<div class="empty"><div class="icon">📅</div><p>No games scheduled yet.</p></div>';
-    return;
-  }
-
+  if (!gamesData.length) { c.innerHTML = '<div class="empty"><div class="icon">📅</div><p>No games scheduled yet.<br>Check back soon!</p></div>'; return; }
   c.innerHTML = '';
-  
-  try {
-    // 2. Use a safer sort method
-    var sortedGames = [...gamesData].sort((a, b) => new Date(a.date) - new Date(b.date));
+var sortedGames = [...gamesData].reverse();
+  sortedGames.forEach(function(g) {
+    var pct      = Math.min(100, (g.approvedSpots / g.maxSpots) * 100);
+    var spotsLeft= g.spotsLeft;
+    var isOpen   = g.registrationOpen && spotsLeft > 0;
+    var isFew    = isOpen && spotsLeft <= 4;
+    var badgeHtml, badgeClass;
+    if (!g.registrationOpen) { badgeHtml = 'Registration Closed'; badgeClass = 'badge-closed'; }
+    else if (spotsLeft <= 0)  { badgeHtml = 'Full'; badgeClass = 'badge-full'; }
+    else if (isFew)           { badgeHtml = spotsLeft + ' spots left'; badgeClass = 'badge-few'; }
+    else                      { badgeHtml = spotsLeft + ' spots left'; badgeClass = 'badge-open'; }
 
-    sortedGames.forEach(function(g) {
-      // ... your existing code to create the div ...
-      var div = document.createElement('div');
-      // Ensure variables like g.approvedSpots and g.maxSpots exist
-      var pct = g.maxSpots > 0 ? Math.min(100, (g.approvedSpots / g.maxSpots) * 100) : 0;
-      
-      // ... rest of your render logic ...
-      c.appendChild(div);
-    });
-  } catch (err) {
-    console.error("Rendering error:", err);
-    c.innerHTML = '<div class="empty"><p>Error displaying games. Check console.</p></div>';
-  }
+    var div = document.createElement('div');
+    div.className = 'game-card' + (isOpen ? '' : ' closed');
+    div.innerHTML =
+      '<div class="gc-top">' +
+        '<div class="gc-name">' + esc(g.name) + '</div>' +
+        '<span class="gc-badge ' + badgeClass + '">' + badgeHtml + '</span>' +
+      '</div>' +
+      '<div class="gc-meta">' +
+        '<span>📅 ' + fmtDate(g.date) + ' · ' + fmtDay(g.date) + '</span>' +
+        '<span>⏰ ' + fmtTime(g.time) + '</span>' +
+        '<span>📍 ' + esc(g.location.split(',')[0]) + '</span>' +
+        '<span>👟 ' + esc(g.format) + '</span>' +
+      '</div>' +
+      '<div class="spots-bar"><div class="spots-fill" data-pct="' + pct + '" style="width:0%"></div></div>' +
+      '<div class="gc-footer">' +
+        '<div class="gc-price">' + g.pricePerPlayer + ' ETB <small>/ player</small></div>' +
+        '<button class="btn-join"' + (isOpen ? '' : ' disabled') + '>' + (isOpen ? 'Join →' : 'Closed') + '</button>' +
+      '</div>';
+
+    if (isOpen) {
+      div.querySelector('.btn-join').addEventListener('click', function(e) { e.stopPropagation(); openForm(g.id); });
+      div.addEventListener('click', function() { openForm(g.id); });
+    }
+    c.appendChild(div);
+    // Animate bar
+    setTimeout(function() { var bar = div.querySelector('.spots-fill'); if (bar) bar.style.width = pct + '%'; }, 100);
+  });
 }
 
 /* ─── FORM ──────────────────────────────────────────────────────────── */

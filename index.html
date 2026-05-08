@@ -570,6 +570,17 @@ function doLogout() {
 
 /* ─── GAMES ─────────────────────────────────────────────────────────── */
 async function loadGames() {
+try {
+    console.log("Fetching games from:", API + '/api/games');
+    var r = await apiFetch(API + '/api/games', 'GET', null, false);
+    console.log("Games received:", r.games); // Check if this shows in your browser console
+    gamesData = r.games;
+    renderGames();
+  } catch (e) {
+    console.error("Fetch failed:", e);
+    document.getElementById('games-list').innerHTML = '...'; 
+  }
+
   try {
     var r   = await apiFetch(API + '/api/games', 'GET', null, false);
     gamesData = r.games;

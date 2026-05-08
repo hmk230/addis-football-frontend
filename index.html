@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Addis Football Meetup</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & TOKENS ─────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --c-bg:#f9fafb;
+  --c-surface:#ffffff;
+  --c-border:#e5e7eb;
+  --c-border-focus:#10b981;
+  --c-text:#111827;
+  --c-text-2:#6b7280;
+  --c-text-3:#9ca3af;
+  --c-green:#10b981;
+  --c-green-dark:#059669;
+  --c-green-light:#ecfdf5;
+  --c-green-mid:#d1fae5;
+  --c-amber:#f59e0b;
+  --c-amber-light:#fffbeb;
+  --c-red:#ef4444;
+  --c-red-light:#fef2f2;
+  --c-blue:#3b82f6;
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;font-size:15px;background:var(--c-bg);color:var(--c-text);line-height:1.5}
+body{overflow-x:hidden;padding-bottom:100px}
+
+/* ── VIEWS ──────────────────────────────────────────────────────────── */
+.view{display:none;animation:fadeUp .22s ease}
+.view.show{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── TOPBAR ─────────────────────────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--c-surface);border-bottom:1px solid var(--c-border);
+  padding:0 16px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.topbar-logo{display:flex;align-items:center;gap:8px}
+.topbar-logo .ball{width:30px;height:30px;background:var(--c-green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.topbar-logo .name{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.avatar-chip{
+  display:flex;align-items:center;gap:6px;
+  background:var(--c-bg);border:1px solid var(--c-border);
+  border-radius:20px;padding:4px 10px 4px 4px;cursor:pointer;
+}
+.avatar{width:24px;height:24px;background:var(--c-green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--c-green)}
+.avatar-name{font-size:12px;font-weight:500;color:var(--c-text-2)}
+.logout-btn{font-size:12px;font-weight:600;color:var(--c-text-3);cursor:pointer;background:none;border:none;padding:4px}
+
+/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:40;
+  background:var(--c-surface);border-top:1px solid var(--c-border);
+  height:64px;display:flex;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;border:none;background:none;
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:500;
+  color:var(--c-text-3);cursor:pointer;transition:color .15s;
+}
+.nav-btn .icon{font-size:20px}
+.nav-btn.active{color:var(--c-green);font-weight:600}
+
+/* ── PAGE HEADER ────────────────────────────────────────────────────── */
+.page-pad{padding:16px}
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--c-text-2)}
+
+/* ── CARDS ──────────────────────────────────────────────────────────── */
+.card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);overflow:hidden}
+.card+.card{margin-top:10px}
+
+/* ── GAME CARD ──────────────────────────────────────────────────────── */
+.game-card{
+  background:var(--c-surface);border:1px solid var(--c-border);
+  border-radius:var(--radius);padding:16px;margin-bottom:10px;
+  cursor:pointer;transition:border-color .15s,box-shadow .15s;
+}
+.game-card:hover{border-color:var(--c-green);box-shadow:var(--shadow-md)}
+.game-card.closed{opacity:.55;cursor:not-allowed}
+.game-card:active{transform:scale(.99)}
+.gc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.gc-name{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.gc-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.2px;white-space:nowrap}
+.badge-open{background:var(--c-green-light);color:var(--c-green)}
+.badge-few{background:var(--c-amber-light);color:var(--c-amber)}
+.badge-full{background:#f3f4f6;color:var(--c-text-3)}
+.badge-closed{background:#f3f4f6;color:var(--c-text-3)}
+.gc-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--c-text-2);margin-bottom:12px}
+.gc-footer{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--c-border)}
+.gc-price{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.gc-price small{font-size:11px;font-weight:400;color:var(--c-text-3)}
+.gc-spots{font-size:12px;color:var(--c-text-2)}
+.btn-join{
+  background:var(--c-green);color:#fff;font-size:13px;font-weight:600;
+  padding:8px 18px;border-radius:25px;border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:background .15s;
+}
+.btn-join:hover{background:var(--c-green-dark)}
+.btn-join:disabled{background:var(--c-border);color:var(--c-text-3);cursor:not-allowed}
+
+/* ── SPOTS BAR ──────────────────────────────────────────────────────── */
+.spots-bar{height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden;margin-top:6px}
+.spots-fill{height:100%;background:var(--c-green);border-radius:2px;transition:width 1s}
+
+/* ── FORM ───────────────────────────────────────────────────────────── */
+.form-section{padding:0 16px;margin-bottom:16px}
+.form-section:first-child{margin-top:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--c-text-2);margin-bottom:6px;letter-spacing:.1px}
+.form-input,.form-select{
+  display:block;width:100%;padding:11px 14px;
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);font-size:15px;font-family:'Inter',sans-serif;
+  color:var(--c-text);outline:none;transition:border-color .15s;appearance:none;
+}
+.form-input:focus,.form-select:focus{border-color:var(--c-border-focus)}
+.form-input::placeholder{color:var(--c-text-3)}
+.form-input.err,.form-select.err{border-color:var(--c-red)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field-err{font-size:11px;color:var(--c-red);margin-top:4px}
+.section-title{font-size:15px;font-weight:700;letter-spacing:-.3px;margin-bottom:12px}
+
+/* ── TOTAL SUMMARY ──────────────────────────────────────────────────── */
+.total-box{
+  background:var(--c-green-light);border:1px solid var(--c-green-mid);
+  border-radius:var(--radius);padding:14px 16px;margin:0 16px 16px;
+}
+.total-row{display:flex;justify-content:space-between;font-size:13px;color:var(--c-text-2);margin-bottom:4px}
+.total-row:last-child{margin-bottom:0;font-size:17px;font-weight:700;color:var(--c-text);border-top:1px solid var(--c-green-mid);padding-top:10px;margin-top:6px}
+
+/* ── ALERT BOX ──────────────────────────────────────────────────────── */
+.alert{border-radius:var(--radius);padding:12px 14px;font-size:13px;line-height:1.5;margin:0 16px 14px}
+.alert-err{background:var(--c-red-light);border:1px solid #fecaca;color:#b91c1c}
+.alert-ok{background:var(--c-green-light);border:1px solid var(--c-green-mid);color:var(--c-green-dark)}
+
+/* ── PRIMARY BUTTON ─────────────────────────────────────────────────── */
+.btn-primary{
+  display:block;width:calc(100% - 32px);margin:0 16px 12px;
+  background:var(--c-green);color:#fff;font-size:15px;font-weight:600;
+  padding:14px;border-radius:var(--radius);border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;letter-spacing:-.1px;
+  transition:background .15s,transform .1s;text-align:center;
+}
+.btn-primary:hover{background:var(--c-green-dark)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{background:var(--c-border);color:var(--c-text-3);cursor:not-allowed;transform:none}
+.btn-secondary{
+  display:block;width:calc(100% - 32px);margin:0 16px 12px;
+  background:transparent;color:var(--c-text-2);font-size:14px;font-weight:500;
+  padding:12px;border-radius:var(--radius);border:1.5px solid var(--c-border);
+  cursor:pointer;font-family:'Inter',sans-serif;text-align:center;transition:border-color .15s;
+}
+.btn-secondary:hover{border-color:var(--c-text-2)}
+
+/* ── GAME SUMMARY CHIP ──────────────────────────────────────────────── */
+.game-chip{
+  display:flex;align-items:center;gap:12px;
+  background:var(--c-surface);border:1px solid var(--c-border);
+  border-radius:var(--radius);padding:12px 14px;margin:0 16px 16px;
+}
+.game-chip .chip-ball{width:36px;height:36px;background:var(--c-green-light);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.game-chip .chip-info .name{font-size:14px;font-weight:700}
+.game-chip .chip-info .meta{font-size:12px;color:var(--c-text-2);margin-top:1px}
+.game-chip .chip-price{margin-left:auto;text-align:right;flex-shrink:0}
+.game-chip .chip-price .price{font-size:16px;font-weight:700;color:var(--c-green)}
+.game-chip .chip-price .per{font-size:11px;color:var(--c-text-3)}
+
+/* ── PAYMENT INFO ───────────────────────────────────────────────────── */
+.ticket-card{
+  background:var(--c-surface);border:1px solid var(--c-border);
+  border-radius:var(--radius);overflow:hidden;margin:0 16px 12px;
+}
+.ticket-header{background:var(--c-green);color:#fff;padding:12px 16px}
+.ticket-header .th-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;opacity:.8;margin-bottom:2px}
+.ticket-header .th-game{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.ticket-header .th-code{font-size:13px;font-family:monospace;opacity:.9;margin-top:4px}
+.ticket-body{padding:0}
+.ticket-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--c-border)}
+.ticket-row:last-child{border-bottom:none}
+.ticket-row .tr-label{font-size:13px;color:var(--c-text-2)}
+.ticket-row .tr-value{font-size:14px;font-weight:600;text-align:right;max-width:60%}
+.ticket-row .tr-value.highlight{color:var(--c-green);font-size:18px;font-weight:700}
+.ticket-row .tr-value.code{font-family:monospace;font-size:15px;letter-spacing:1px;color:var(--c-green)}
+
+.tg-box{
+  background:var(--c-surface);border:1px solid var(--c-border);
+  border-radius:var(--radius);padding:18px 16px;margin:0 16px 12px;text-align:center;
+}
+.tg-box .tg-icon{font-size:36px;margin-bottom:8px}
+.tg-box .tg-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.tg-box .tg-sub{font-size:13px;color:var(--c-text-2);line-height:1.5;margin-bottom:14px}
+.tg-link{
+  display:inline-block;background:#2BA5E0;color:#fff;
+  font-size:14px;font-weight:600;padding:10px 24px;border-radius:25px;
+  text-decoration:none;font-family:'Inter',sans-serif;
+}
+.tg-note{font-size:11px;color:var(--c-text-3);margin-top:10px;line-height:1.5}
+
+/* ── STEPS ──────────────────────────────────────────────────────────── */
+.steps{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:16px;margin:0 16px 12px}
+.steps-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.step-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6}
+.step-item:last-child{border-bottom:none;padding-bottom:0}
+.step-num{width:22px;height:22px;background:var(--c-green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-txt{font-size:13px;color:var(--c-text-2);line-height:1.5}
+.step-txt strong{color:var(--c-text)}
+
+/* ── MY SPOTS ───────────────────────────────────────────────────────── */
+.reg-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.reg-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.reg-name{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.reg-game{font-size:12px;color:var(--c-text-2);margin-top:2px}
+.status-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.pill-pending{background:var(--c-amber-light);color:var(--c-amber)}
+.pill-approved{background:var(--c-green-light);color:var(--c-green-dark)}
+.pill-rejected{background:var(--c-red-light);color:var(--c-red)}
+.reg-meta{font-size:12px;color:var(--c-text-2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.reg-code{font-size:11px;font-family:monospace;color:var(--c-text-3);letter-spacing:.5px}
+.rejection-note{font-size:12px;color:var(--c-red);background:var(--c-red-light);border-radius:6px;padding:7px 10px;margin-top:8px;border:1px solid #fecaca}
+
+/* ── AUTH SCREEN ─────────────────────────────────────────────────────── */
+.auth-screen{
+  min-height:100vh;background:var(--c-bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 20px;
+}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.auth-logo .ball{width:44px;height:44px;background:var(--c-green);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.auth-logo .brand{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.auth-box{background:var(--c-surface);border:1px solid var(--c-border);border-radius:16px;padding:28px 24px;width:100%;max-width:380px;box-shadow:var(--shadow-md)}
+.auth-tabs{display:flex;background:#f3f4f6;border-radius:10px;padding:3px;margin-bottom:22px}
+.auth-tab{flex:1;padding:8px;text-align:center;font-size:14px;font-weight:600;color:var(--c-text-3);cursor:pointer;border-radius:8px;border:none;background:none;font-family:'Inter',sans-serif;transition:all .15s}
+.auth-tab.active{background:var(--c-surface);color:var(--c-text);box-shadow:var(--shadow)}
+.auth-field{margin-bottom:14px}
+.auth-label{display:block;font-size:12px;font-weight:600;color:var(--c-text-2);margin-bottom:6px}
+.auth-input{
+  display:block;width:100%;padding:11px 14px;
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);font-size:15px;font-family:'Inter',sans-serif;
+  color:var(--c-text);outline:none;transition:border-color .15s;
+}
+.auth-input:focus{border-color:var(--c-border-focus)}
+.auth-input::placeholder{color:var(--c-text-3)}
+.auth-input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth-submit{
+  width:100%;background:var(--c-green);color:#fff;font-size:15px;font-weight:600;
+  padding:13px;border-radius:var(--radius);border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;margin-top:6px;transition:background .15s;
+}
+.auth-submit:hover{background:var(--c-green-dark)}
+.auth-err{font-size:13px;color:var(--c-red);background:var(--c-red-light);border:1px solid #fecaca;border-radius:8px;padding:10px 12px;margin-bottom:14px;display:none}
+.auth-err.show{display:block}
+.auth-note{font-size:11px;color:var(--c-text-3);text-align:center;margin-top:14px;line-height:1.5}
+
+/* ── EMPTY ──────────────────────────────────────────────────────────── */
+.empty{text-align:center;padding:48px 20px;color:var(--c-text-3)}
+.empty .icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty p{font-size:14px;line-height:1.6}
+
+/* ── SPINNER ────────────────────────────────────────────────────────── */
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOAST ──────────────────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:#1f2937;color:#fff;font-size:13px;font-weight:500;
+  padding:10px 18px;border-radius:25px;opacity:0;transition:all .25s;
+  z-index:999;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-md);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.spacer{height:20px}
+</style>
+</head>
+<body>
+
+<script>
+  // ── UPDATE THIS before deploying ──────────────────────────────────────
+  var API = 'https://addis-football-backend-production.up.railway.app';
+  // ──────────────────────────────────────────────────────────────────────
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════════════════════════ -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-logo">
+    <div class="ball">⚽</div>
+    <div class="brand">Addis Football</div>
+  </div>
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"  onclick="authMode('login')">Log In</button>
+      <button class="auth-tab"        id="tab-signup" onclick="authMode('signup')">Sign Up</button>
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+
+    <!-- login fields -->
+    <div id="login-fields">
+      <div class="auth-field">
+        <label class="auth-label">Phone Number</label>
+        <input class="auth-input" type="tel" id="l-phone" placeholder="+251 9..."/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/>
+      </div>
+    </div>
+
+    <!-- signup fields -->
+    <div id="signup-fields" style="display:none">
+      <div class="auth-field">
+        <label class="auth-label">Full Name</label>
+        <input class="auth-input" type="text" id="s-name" placeholder="Abebe Girma"/>
+      </div>
+      <div class="auth-input-row" style="margin-bottom:14px">
+        <div>
+          <label class="auth-label">Phone Number</label>
+          <input class="auth-input" type="tel" id="s-phone" placeholder="+251 9..."/>
+        </div>
+        <div>
+          <label class="auth-label">Age</label>
+          <input class="auth-input" type="number" id="s-age" placeholder="24" min="14" max="70"/>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" type="password" id="s-pass" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doAuth()"/>
+      </div>
+    </div>
+
+    <button class="auth-submit" id="auth-btn" onclick="doAuth()">Log In</button>
+    <p class="auth-note" id="auth-note">Don't have an account? Switch to Sign Up above.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════════════════════ -->
+<div id="main-app" style="display:none">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="ball">⚽</div>
+      <div class="name">Addis Football</div>
+    </div>
+    <div class="topbar-right">
+      <div class="avatar-chip" onclick="doLogout()">
+        <div class="avatar" id="user-avatar">?</div>
+        <span class="avatar-name" id="user-name">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: GAMES LIST ────────────────────────────────── -->
+  <div id="view-games" class="view show">
+    <div class="page-pad">
+      <div class="page-title">Upcoming Games</div>
+      <div class="page-sub">Select a game to register your team</div>
+    </div>
+    <div style="padding:0 16px 16px" id="games-list">
+      <div class="empty"><div class="icon">⏳</div><p>Loading games…</p></div>
+    </div>
+<div style="height: 40px;"></div>
+  </div>
+
+  <!-- ── VIEW: REGISTRATION FORM ────────────────────────── -->
+  <div id="view-form" class="view">
+    <div class="page-pad">
+      <button onclick="showView('games')" style="background:none;border:none;font-family:'Inter',sans-serif;font-size:13px;color:var(--c-text-2);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:14px">← Back to Games</button>
+      <div class="page-title" id="form-title">Register</div>
+      <div class="page-sub">Fill in your details to reserve spots</div>
+    </div>
+
+    <div class="game-chip" id="form-game-chip"></div>
+
+    <div class="form-section">
+      <div class="section-title">Registration Details</div>
+      <div class="alert alert-err" id="form-err" style="display:none;margin:0 0 12px"></div>
+      <label class="form-label">Number of Players</label>
+      <select class="form-select" id="f-count" onchange="recalc()">
+        <option value="">Select number of players</option>
+      </select>
+    </div>
+
+    <div class="total-box" id="total-box" style="display:none">
+      <div class="total-row"><span>Players</span><span id="tc-players">—</span></div>
+      <div class="total-row"><span>Price per player</span><span id="tc-price">—</span></div>
+      <div class="total-row"><span>Total to pay</span><span id="tc-total">—</span></div>
+    </div>
+
+    <button class="btn-primary" id="form-submit-btn" onclick="submitReg()">Reserve Spots</button>
+    <div class="spacer"></div>
+  </div>
+
+  <!-- ── VIEW: PAYMENT INFO ──────────────────────────────── -->
+  <div id="view-payment" class="view">
+    <div class="page-pad">
+      <div class="page-title">Complete Payment</div>
+      <div class="page-sub">Transfer the amount and send a screenshot</div>
+    </div>
+
+    <div class="alert alert-ok" style="margin:0 16px 14px">
+      🎉 Your spot is reserved! Complete payment within 30 minutes to confirm.
+    </div>
+
+    <div class="ticket-card">
+      <div class="ticket-header">
+        <div class="th-label">Match Ticket</div>
+        <div class="th-game" id="tk-game">—</div>
+        <div class="th-code" id="tk-code-sub">—</div>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row"><span class="tr-label">Date & Time</span><span class="tr-value" id="tk-datetime">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Location</span><span class="tr-value" id="tk-location">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Players</span><span class="tr-value" id="tk-players">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Total Amount</span><span class="tr-value highlight" id="tk-amount">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Reference Code</span><span class="tr-value code" id="tk-code">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Status</span><span class="tr-value" style="color:var(--c-amber)">⏳ Pending Payment</span></div>
+      </div>
+    </div>
+
+    <div class="ticket-card" style="margin-top:0">
+      <div class="ticket-header" style="background:#1f2937">
+        <div class="th-label">Transfer Money To</div>
+        <div class="th-game" style="font-size:14px" id="pi-bank-name">—</div>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row"><span class="tr-label">Account Name</span><span class="tr-value" id="pi-acc-name">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Account Number</span><span class="tr-value" id="pi-acc-num">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Telebirr</span><span class="tr-value" id="pi-telebirr">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Amount (ETB)</span><span class="tr-value highlight" id="pi-amount">—</span></div>
+        <div class="ticket-row"><span class="tr-label">Reference / Note</span><span class="tr-value code" id="pi-ref">—</span></div>
+      </div>
+    </div>
+
+    <div class="tg-box">
+      <div class="tg-icon">📩</div>
+      <div class="tg-title">Send Screenshot on Telegram</div>
+      <div class="tg-sub">After transferring, take a screenshot of your payment confirmation and send it to us on Telegram with your ticket code.</div>
+      <a class="tg-link" id="tg-link" href="#" target="_blank">Open Telegram</a>
+      <p class="tg-note" id="tg-note">—</p>
+    </div>
+
+    <div class="steps">
+      <div class="steps-title">What to do next</div>
+      <div class="step-item"><div class="step-num">1</div><div class="step-txt">Transfer the <strong>exact amount</strong> to the bank account or Telebirr number shown above.</div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-txt"><strong>Screenshot</strong> your payment confirmation screen.</div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-txt">Open Telegram and <strong>message us</strong> at the address above.</div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-txt">Include your <strong>ticket code</strong> (<span id="steps-code" style="font-family:monospace;color:var(--c-green)">—</span>) in the message.</div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-txt">We'll <strong>confirm your spot</strong> within a few hours. You'll see it in My Spots. ✅</div></div>
+    </div>
+
+    <button class="btn-secondary" onclick="showView('games')">← Back to Games</button>
+    <div class="spacer"></div>
+  </div>
+
+  <!-- ── VIEW: MY SPOTS ──────────────────────────────────── -->
+  <div id="view-spots" class="view">
+    <div class="page-pad">
+      <div class="page-title">My Spots</div>
+      <div class="page-sub">Your registrations and payment status</div>
+    </div>
+    <div style="padding:0 16px 16px" id="spots-list">
+      <div class="empty"><div class="icon">⏳</div><p>Loading…</p></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-games" onclick="navTo('games')">
+      <span class="icon">🗓</span>Games
+    </button>
+    <button class="nav-btn" id="nav-spots" onclick="navTo('spots');loadMySpots()">
+      <span class="icon">🎟</span>My Spots
+    </button>
+  </div>
+
+</div><!-- /main-app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+if (window.Telegram?.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+
+/* ─── STATE ─────────────────────────────────────────────────────────── */
+var token     = localStorage.getItem('afm_token') || null;
+var me        = null;
+var gamesData = [];
+var currentGame = null;
+var isLogin   = true;
+
+/* ─── INIT ──────────────────────────────────────────────────────────── */
+(async function init() {
+  if (!token) { showAuth(); return; }
+  try {
+    var r = await apiFetch(API + '/api/auth/me', 'GET');
+    me = r.user;
+    showApp();
+  } catch { token = null; localStorage.removeItem('afm_token'); showAuth(); }
+})();
+
+/* ─── AUTH ──────────────────────────────────────────────────────────── */
+function showAuth() { document.getElementById('auth-screen').style.display = 'flex'; document.getElementById('main-app').style.display = 'none'; }
+function showApp()  {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('main-app').style.display    = 'block';
+  document.getElementById('user-avatar').textContent   = (me.fullName || '?')[0].toUpperCase();
+  document.getElementById('user-name').textContent     = me.fullName.split(' ')[0];
+  loadGames();
+}
+
+function authMode(m) {
+  isLogin = m === 'login';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+  document.getElementById('login-fields').style.display  = isLogin ? 'block' : 'none';
+  document.getElementById('signup-fields').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('auth-btn').textContent        = isLogin ? 'Log In' : 'Create Account';
+  document.getElementById('auth-note').textContent       = isLogin ? "Don't have an account? Switch to Sign Up above." : 'Already have an account? Switch to Log In above.';
+  document.getElementById('auth-err').classList.remove('show');
+}
+
+async function doAuth() {
+  var errEl = document.getElementById('auth-err');
+  var btn   = document.getElementById('auth-btn');
+  errEl.classList.remove('show');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+  try {
+    var body, url;
+    if (isLogin) {
+      url  = API + '/api/auth/login';
+      body = { phone: val('l-phone'), password: val('l-pass') };
+    } else {
+      url  = API + '/api/auth/signup';
+      body = { fullName: val('s-name'), phone: val('s-phone'), age: val('s-age') || null, password: val('s-pass') };
+    }
+    var r = await apiFetch(url, 'POST', body, false);
+    token = r.token; me = r.user;
+    localStorage.setItem('afm_token', token);
+    showApp();
+  } catch (e) {
+    errEl.textContent = e.message; errEl.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = isLogin ? 'Log In' : 'Create Account';
+  }
+}
+
+function doLogout() {
+  token = null; me = null; localStorage.removeItem('afm_token');
+  showAuth();
+}
+
+/* ─── GAMES ─────────────────────────────────────────────────────────── */
+async function loadGames() {
+  try {
+    var r   = await apiFetch(API + '/api/games', 'GET', null, false);
+    gamesData = r.games;
+    renderGames();
+  } catch (e) {
+    document.getElementById('games-list').innerHTML = '<div class="empty"><div class="icon">📡</div><p>Could not load games. Please try again.</p></div>';
+  }
+}
+
+function renderGames() {
+  var c = document.getElementById('games-list');
+  if (!gamesData.length) { c.innerHTML = '<div class="empty"><div class="icon">📅</div><p>No games scheduled yet.<br>Check back soon!</p></div>'; return; }
+  c.innerHTML = '';
+var sortedGames = [...gamesData].reverse();
+  sortedGames.forEach(function(g) {
+    var pct      = Math.min(100, (g.approvedSpots / g.maxSpots) * 100);
+    var spotsLeft= g.spotsLeft;
+    var isOpen   = g.registrationOpen && spotsLeft > 0;
+    var isFew    = isOpen && spotsLeft <= 4;
+    var badgeHtml, badgeClass;
+    if (!g.registrationOpen) { badgeHtml = 'Registration Closed'; badgeClass = 'badge-closed'; }
+    else if (spotsLeft <= 0)  { badgeHtml = 'Full'; badgeClass = 'badge-full'; }
+    else if (isFew)           { badgeHtml = spotsLeft + ' spots left'; badgeClass = 'badge-few'; }
+    else                      { badgeHtml = spotsLeft + ' spots left'; badgeClass = 'badge-open'; }
+
+    var div = document.createElement('div');
+    div.className = 'game-card' + (isOpen ? '' : ' closed');
+    div.innerHTML =
+      '<div class="gc-top">' +
+        '<div class="gc-name">' + esc(g.name) + '</div>' +
+        '<span class="gc-badge ' + badgeClass + '">' + badgeHtml + '</span>' +
+      '</div>' +
+      '<div class="gc-meta">' +
+        '<span>📅 ' + fmtDate(g.date) + ' · ' + fmtDay(g.date) + '</span>' +
+        '<span>⏰ ' + fmtTime(g.time) + '</span>' +
+        '<span>📍 ' + esc(g.location.split(',')[0]) + '</span>' +
+        '<span>👟 ' + esc(g.format) + '</span>' +
+      '</div>' +
+      '<div class="spots-bar"><div class="spots-fill" data-pct="' + pct + '" style="width:0%"></div></div>' +
+      '<div class="gc-footer">' +
+        '<div class="gc-price">' + g.pricePerPlayer + ' ETB <small>/ player</small></div>' +
+        '<button class="btn-join"' + (isOpen ? '' : ' disabled') + '>' + (isOpen ? 'Join →' : 'Closed') + '</button>' +
+      '</div>';
+
+    if (isOpen) {
+      div.querySelector('.btn-join').addEventListener('click', function(e) { e.stopPropagation(); openForm(g.id); });
+      div.addEventListener('click', function() { openForm(g.id); });
+    }
+    c.appendChild(div);
+    // Animate bar
+    setTimeout(function() { var bar = div.querySelector('.spots-fill'); if (bar) bar.style.width = pct + '%'; }, 100);
+  });
+}
+
+/* ─── FORM ──────────────────────────────────────────────────────────── */
+function openForm(gameId) {
+  currentGame = gamesData.find(function(g) { return g.id === gameId; });
+  if (!currentGame) return;
+
+  document.getElementById('form-title').textContent = 'Register for ' + currentGame.name;
+  document.getElementById('form-game-chip').innerHTML =
+    '<div class="chip-ball">⚽</div>' +
+    '<div class="chip-info">' +
+      '<div class="name">' + esc(currentGame.name) + '</div>' +
+      '<div class="meta">' + fmtDate(currentGame.date) + ' · ' + fmtTime(currentGame.time) + ' · ' + esc(currentGame.location.split(',')[0]) + '</div>' +
+    '</div>' +
+    '<div class="chip-price"><div class="price">' + currentGame.pricePerPlayer + '</div><div class="per">ETB/player</div></div>';
+
+  // Populate dropdown capped at spotsLeft
+  var sel = document.getElementById('f-count');
+  var max = Math.min(20, currentGame.spotsLeft);
+  sel.innerHTML = '<option value="">Select number of players</option>';
+  for (var i = 1; i <= max; i++) {
+    sel.innerHTML += '<option value="' + i + '">' + i + ' player' + (i > 1 ? 's' : '') + '</option>';
+  }
+  document.getElementById('total-box').style.display = 'none';
+  document.getElementById('form-err').style.display  = 'none';
+  showView('form');
+  navHighlight('games');
+}
+
+function recalc() {
+  var count = Number(document.getElementById('f-count').value);
+  var box   = document.getElementById('total-box');
+  if (!count || !currentGame) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  var total = count * currentGame.pricePerPlayer;
+  document.getElementById('tc-players').textContent = count + ' player' + (count > 1 ? 's' : '');
+  document.getElementById('tc-price').textContent   = currentGame.pricePerPlayer + ' ETB';
+  document.getElementById('tc-total').textContent   = total + ' ETB';
+}
+
+async function submitReg() {
+  var count = Number(document.getElementById('f-count').value);
+  var errEl = document.getElementById('form-err');
+  errEl.style.display = 'none';
+  if (!count) { errEl.textContent = 'Please select how many players you are registering.'; errEl.style.display = 'block'; return; }
+
+  var btn = document.getElementById('form-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Reserving…';
+  try {
+    var r   = await apiFetch(API + '/api/registrations', 'POST', { gameId: currentGame.id, playerCount: count });
+    var reg = r.registration;
+    var pi  = r.paymentInfo;
+
+    // Ticket
+    document.getElementById('tk-game').textContent     = currentGame.name;
+    document.getElementById('tk-code-sub').textContent = 'Code: ' + reg.code;
+    document.getElementById('tk-datetime').textContent = fmtDate(currentGame.date) + ' · ' + fmtTime(currentGame.time);
+    document.getElementById('tk-location').textContent = currentGame.location;
+    document.getElementById('tk-players').textContent  = count + ' player' + (count > 1 ? 's' : '');
+    document.getElementById('tk-amount').textContent   = reg.totalAmount + ' ETB';
+    document.getElementById('tk-code').textContent     = reg.code;
+    document.getElementById('steps-code').textContent  = reg.code;
+
+    // Payment info
+    document.getElementById('pi-bank-name').textContent = pi.bankName;
+    document.getElementById('pi-acc-name').textContent  = pi.accountName;
+    document.getElementById('pi-acc-num').textContent   = pi.accountNumber;
+    document.getElementById('pi-telebirr').textContent  = pi.telebirr;
+    document.getElementById('pi-amount').textContent    = pi.amount + ' ETB';
+    document.getElementById('pi-ref').textContent       = pi.reference;
+
+    // Telegram link
+    var handle = pi.telegram || '@AddisFootballAdmin';
+    var tgUser = handle.replace('@', '');
+    var tgMsg  = 'Hi! I registered for ' + currentGame.name + '. My ticket code is ' + reg.code + '. Sending my payment screenshot now.';
+    document.getElementById('tg-link').href        = 'https://t.me/' + tgUser + '?text=' + encodeURIComponent(tgMsg);
+    document.getElementById('tg-link').textContent = 'Message ' + handle;
+    document.getElementById('tg-note').textContent = 'Send screenshot to ' + handle + ' with code: ' + reg.code;
+
+    await loadGames(); // refresh spots
+    showView('payment');
+    navHighlight('games');
+    toast('✅ Spot reserved! ' + reg.code);
+    if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+  } catch (e) {
+    errEl.textContent = e.message; errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Reserve Spots';
+  }
+}
+
+/* ─── MY SPOTS ──────────────────────────────────────────────────────── */
+async function loadMySpots() {
+  var c = document.getElementById('spots-list');
+  c.innerHTML = '<div class="empty"><div class="icon">⏳</div><p>Loading…</p></div>';
+  try {
+    var r = await apiFetch(API + '/api/registrations/my', 'GET');
+    var regs = r.registrations;
+    if (!regs.length) { c.innerHTML = '<div class="empty"><div class="icon">🎟</div><p>No registrations yet.<br>Browse games and join one!</p></div>'; return; }
+    c.innerHTML = '';
+    regs.forEach(function(reg) {
+      var g = reg.game || {};
+      var pillClass = { approved: 'pill-approved', pending: 'pill-pending', rejected: 'pill-rejected' }[reg.status] || 'pill-pending';
+      var pillLabel = { approved: '✓ Confirmed', pending: '⏳ Pending', rejected: '❌ Rejected' }[reg.status] || reg.status;
+      var div = document.createElement('div');
+      div.className = 'reg-card';
+      div.innerHTML =
+        '<div class="reg-card-top">' +
+          '<div><div class="reg-name">' + esc(g.name || '—') + '</div><div class="reg-game">' + fmtDate(g.date) + ' · ' + fmtTime(g.time) + '</div></div>' +
+          '<span class="status-pill ' + pillClass + '">' + pillLabel + '</span>' +
+        '</div>' +
+        '<div class="reg-meta"><span>👥 ' + reg.playerCount + ' player' + (reg.playerCount > 1 ? 's' : '') + '</span><span>💰 ' + reg.totalAmount + ' ETB</span></div>' +
+        '<div class="reg-code">' + reg.code + '</div>' +
+        (reg.status === 'rejected' && reg.rejectionReason ? '<div class="rejection-note">Reason: ' + esc(reg.rejectionReason) + '</div>' : '');
+      c.appendChild(div);
+    });
+  } catch (e) { c.innerHTML = '<div class="empty"><div class="icon">⚠️</div><p>' + esc(e.message) + '</p></div>'; }
+}
+
+/* ─── NAVIGATION ────────────────────────────────────────────────────── */
+function showView(v) {
+  document.querySelectorAll('.view').forEach(function(el) { el.classList.remove('show'); });
+  document.getElementById('view-' + v).classList.add('show');
+  window.scrollTo(0, 0);
+}
+function navTo(v) { navHighlight(v); showView(v); }
+function navHighlight(v) {
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  var el = document.getElementById('nav-' + v);
+  if (el) el.classList.add('active');
+}
+
+/* ─── HELPERS ───────────────────────────────────────────────────────── */
+function val(id) { return (document.getElementById(id)?.value || '').trim(); }
+function esc(s)  { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+function fmtDay(d) {
+  if (!d) return '';
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+}
+function fmtTime(t) {
+  if (!t) return '—';
+  var p = t.split(':'), h = +p[0];
+  return (h % 12 || 12) + ':' + p[1] + ' ' + (h >= 12 ? 'PM' : 'AM');
+}
+
+async function apiFetch(url, method, body, auth) {
+  if (auth === undefined) auth = true;
+  var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+  if (auth && token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body) opts.body = JSON.stringify(body);
+  var res  = await fetch(url, opts);
+  var data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+</html>

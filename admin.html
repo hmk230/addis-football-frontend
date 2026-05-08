@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Addis Football</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --c-bg:#f9fafb;--c-surface:#fff;--c-border:#e5e7eb;
+  --c-text:#111827;--c-text-2:#6b7280;--c-text-3:#9ca3af;
+  --c-green:#10b981;--c-green-dark:#059669;--c-green-light:#ecfdf5;--c-green-mid:#d1fae5;
+  --c-amber:#f59e0b;--c-amber-light:#fffbeb;
+  --c-red:#ef4444;--c-red-light:#fef2f2;
+  --c-blue:#3b82f6;--c-blue-light:#eff6ff;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.10);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;font-size:14px;background:var(--c-bg);color:var(--c-text);line-height:1.5}
+
+/* ── LOGIN ──────────────────────────────────────────────────────────── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--c-bg)}
+.login-box{background:var(--c-surface);border:1px solid var(--c-border);border-radius:16px;padding:32px 28px;width:100%;max-width:360px;box-shadow:var(--shadow-md)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-logo .ball{width:40px;height:40px;background:var(--c-green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.login-logo .brand{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.login-logo .label{font-size:11px;color:var(--c-text-2);font-weight:500}
+.lf{margin-bottom:14px}
+.lf label{display:block;font-size:12px;font-weight:600;color:var(--c-text-2);margin-bottom:5px}
+.lf input{display:block;width:100%;padding:10px 13px;background:var(--c-surface);border:1.5px solid var(--c-border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;color:var(--c-text);outline:none;transition:border-color .15s}
+.lf input:focus{border-color:var(--c-green)}
+.lf input::placeholder{color:var(--c-text-3)}
+.login-btn{width:100%;background:var(--c-green);color:#fff;font-size:14px;font-weight:600;padding:12px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s;margin-top:4px}
+.login-btn:hover{background:var(--c-green-dark)}
+.login-err{font-size:12px;color:var(--c-red);background:var(--c-red-light);border:1px solid #fecaca;border-radius:6px;padding:9px 12px;margin-bottom:12px;display:none}
+.login-err.show{display:block}
+.login-note{font-size:11px;color:var(--c-text-3);text-align:center;margin-top:14px}
+
+/* ── TOPBAR ─────────────────────────────────────────────────────────── */
+#dashboard{display:none}
+.topbar{height:56px;background:var(--c-surface);border-bottom:1px solid var(--c-border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:40}
+.topbar-logo{display:flex;align-items:center;gap:8px}
+.topbar-logo .ball{width:28px;height:28px;background:var(--c-green);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.topbar-logo .name{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.topbar-logo .badge{font-size:10px;font-weight:600;background:var(--c-green-light);color:var(--c-green);border:1px solid var(--c-green-mid);padding:2px 8px;border-radius:20px;margin-left:6px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.pending-badge{font-size:11px;font-weight:700;background:var(--c-amber-light);color:var(--c-amber);border:1px solid #fde68a;padding:4px 10px;border-radius:20px}
+.logout-btn{font-size:12px;font-weight:600;color:var(--c-text-3);cursor:pointer;background:none;border:1px solid var(--c-border);border-radius:6px;padding:5px 10px;font-family:'Inter',sans-serif;transition:color .15s}
+.logout-btn:hover{color:var(--c-text)}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────────── */
+.main{max-width:1100px;margin:0 auto;padding:24px 20px}
+
+/* ── STATS ──────────────────────────────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:16px}
+.stat-card .sv{font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1;margin-bottom:4px}
+.stat-card .sl{font-size:12px;color:var(--c-text-2);font-weight:500}
+.stat-card.green .sv{color:var(--c-green)}
+.stat-card.amber .sv{color:var(--c-amber)}
+
+/* ── TABS ───────────────────────────────────────────────────────────── */
+.tabs{display:flex;gap:2px;background:#f3f4f6;border-radius:10px;padding:3px;margin-bottom:20px;width:fit-content}
+.tab-btn{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;color:var(--c-text-2);cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap}
+.tab-btn .cnt{display:inline-flex;align-items:center;justify-content:center;background:var(--c-red);color:#fff;font-size:10px;font-weight:700;width:16px;height:16px;border-radius:50%;margin-left:4px}
+.tab-btn.active{background:var(--c-surface);color:var(--c-text);font-weight:600;box-shadow:var(--shadow)}
+
+/* ── PANELS ─────────────────────────────────────────────────────────── */
+.panel{display:none}
+.panel.active{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* ── FILTER ROW ─────────────────────────────────────────────────────── */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.filter-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;color:var(--c-text-2);background:var(--c-surface);border:1px solid var(--c-border);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap}
+.filter-chip.active{background:var(--c-text);color:#fff;border-color:var(--c-text)}
+.search-input{padding:7px 12px;border:1px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--c-text);background:var(--c-surface);outline:none;transition:border-color .15s;min-width:200px}
+.search-input:focus{border-color:var(--c-green)}
+.search-input::placeholder{color:var(--c-text-3)}
+.export-btn{margin-left:auto;background:var(--c-green);color:#fff;font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s}
+.export-btn:hover{background:var(--c-green-dark)}
+
+/* ── GAME SECTION ───────────────────────────────────────────────────── */
+.game-section{margin-bottom:24px}
+.game-section-header{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  background:var(--c-surface);border:1px solid var(--c-border);
+  border-radius:var(--radius) var(--radius) 0 0;
+  padding:14px 18px;border-bottom:none;
+}
+.gsh-info .g-name{font-size:16px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.gsh-info .g-meta{font-size:12px;color:var(--c-text-2);display:flex;gap:12px;flex-wrap:wrap}
+.gsh-stats{display:flex;gap:16px;align-items:center;flex-shrink:0}
+.gsh-stat{text-align:center}
+.gsh-stat .v{font-size:20px;font-weight:700;line-height:1;letter-spacing:-.4px}
+.gsh-stat .l{font-size:10px;color:var(--c-text-3);font-weight:500;text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+.v-green{color:var(--c-green)}
+.v-amber{color:var(--c-amber)}
+.gsh-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* ── TABLE ──────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--c-border);border-radius:0 0 var(--radius) var(--radius)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+thead th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.5px;background:#f9fafb;border-bottom:1px solid var(--c-border);white-space:nowrap}
+tbody tr{border-bottom:1px solid #f3f4f6;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#fafafa}
+td{padding:11px 14px;vertical-align:middle}
+td strong{font-weight:600}
+.mono{font-family:monospace;font-size:12px;letter-spacing:.5px}
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}
+.pill-pending{background:var(--c-amber-light);color:var(--c-amber)}
+.pill-approved{background:var(--c-green-light);color:var(--c-green-dark)}
+.pill-rejected{background:var(--c-red-light);color:var(--c-red)}
+.pill-open{background:var(--c-green-light);color:var(--c-green-dark)}
+.pill-closed{background:#f3f4f6;color:var(--c-text-3)}
+.empty-row td{text-align:center;padding:28px;color:var(--c-text-3);font-size:13px}
+
+/* ── ACTION BUTTONS ─────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.82}
+.btn-approve{background:var(--c-green-light);color:var(--c-green-dark)}
+.btn-reject{background:var(--c-red-light);color:var(--c-red)}
+.btn-delete{background:#f3f4f6;color:var(--c-text-2)}
+.btn-edit{background:var(--c-blue-light);color:var(--c-blue)}
+.btn-close{background:var(--c-amber-light);color:var(--c-amber)}
+.btn-reopen{background:var(--c-green-light);color:var(--c-green-dark)}
+.btn-add{background:var(--c-green);color:#fff;font-size:13px;padding:8px 16px;border-radius:var(--radius-sm)}
+.btn-export-sm{background:var(--c-surface);color:var(--c-text-2);border:1px solid var(--c-border);font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .15s}
+.btn-export-sm:hover{border-color:var(--c-green);color:var(--c-green)}
+
+/* ── ADD/EDIT GAME FORM ─────────────────────────────────────────────── */
+.form-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.form-card h3{font-size:15px;font-weight:700;letter-spacing:-.3px;margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr}}
+.ff{margin-bottom:0}
+.ff label{display:block;font-size:11px;font-weight:600;color:var(--c-text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.ff input,.ff select{display:block;width:100%;padding:9px 12px;background:var(--c-bg);border:1.5px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--c-text);outline:none;transition:border-color .15s;appearance:none}
+.ff input:focus,.ff select:focus{border-color:var(--c-green);background:var(--c-surface)}
+.ff input::placeholder{color:var(--c-text-3)}
+.ff select option{background:var(--c-surface)}
+.form-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.create-btn{background:var(--c-green);color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
+.create-btn:hover{background:var(--c-green-dark)}
+.cancel-btn{background:var(--c-surface);color:var(--c-text-2);font-size:13px;font-weight:500;padding:10px 16px;border-radius:var(--radius-sm);border:1px solid var(--c-border);cursor:pointer;font-family:'Inter',sans-serif}
+
+/* ── MODAL ──────────────────────────────────────────────────────────── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex;animation:mfade .15s ease}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+.modal{background:var(--c-surface);border-radius:16px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md)}
+.modal h3{font-size:16px;font-weight:700;letter-spacing:-.3px;margin-bottom:14px}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.modal-btn{padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
+.modal-btn:hover{opacity:.85}
+.mb-cancel{background:#f3f4f6;color:var(--c-text-2)}
+.mb-approve{background:var(--c-green);color:#fff}
+.mb-reject{background:var(--c-red);color:#fff}
+.mb-save{background:var(--c-green);color:#fff}
+.ss-img{width:100%;border-radius:8px;border:1px solid var(--c-border);margin-bottom:12px;max-height:400px;object-fit:contain}
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.detail-row .dk{color:var(--c-text-2)}
+.detail-row .dv{font-weight:600;text-align:right;max-width:60%}
+.reason-input{width:100%;padding:10px 12px;background:var(--c-bg);border:1.5px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--c-text);outline:none;resize:vertical;min-height:80px;margin-top:8px;transition:border-color .15s}
+.reason-input:focus{border-color:var(--c-red);background:var(--c-surface)}
+.reason-input::placeholder{color:var(--c-text-3)}
+
+/* ── GAMES LIST (admin) ─────────────────────────────────────────────── */
+.game-admin-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+.gac-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.gac-name{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.gac-meta{font-size:12px;color:var(--c-text-2);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.gac-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px solid var(--c-border)}
+.gac-stats{display:flex;gap:14px;font-size:12px;color:var(--c-text-2)}
+.gac-stats .sv{font-weight:700;color:var(--c-text)}
+.gac-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ── TOAST ──────────────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;font-size:13px;font-weight:500;padding:10px 16px;border-radius:8px;opacity:0;transition:all .25s;z-index:999;pointer-events:none;box-shadow:var(--shadow-md)}
+.toast.show{opacity:1}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.15);border-top-color:var(--c-green);border-radius:50%;animation:spin .5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:680px){.main{padding:16px 12px}.gsh-stats{display:none}.game-section-header{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<script>var API='https://addis-football-backend-production.up.railway.app';</script>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="ball">⚽</div>
+      <div><div class="brand">Addis Football</div><div class="label">Admin Panel</div></div>
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <div class="lf"><label>Admin Password</label><input type="password" id="lf-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Login</button>
+    <p class="login-note">Restricted access — authorized administrators only.</p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="ball">⚽</div>
+      <div class="name">Addis Football</div>
+      <span class="badge">Admin</span>
+    </div>
+    <div class="topbar-right">
+      <div class="pending-badge" id="pending-badge" style="display:none">⏳ <span id="pending-cnt">0</span> Pending</div>
+      <button class="logout-btn" onclick="doLogout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card green"><div class="sv" id="s-rev">—</div><div class="sl">ETB Revenue (Approved)</div></div>
+      <div class="stat-card"><div class="sv" id="s-players">—</div><div class="sl">Registered Players</div></div>
+      <div class="stat-card"><div class="sv" id="s-approved">—</div><div class="sl">Approved Registrations</div></div>
+      <div class="stat-card amber"><div class="sv" id="s-pending">—</div><div class="sl">Pending Review</div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('regs',this)">Registrations <span class="cnt" id="tab-badge" style="display:none">0</span></button>
+      <button class="tab-btn" onclick="showTab('games',this)">Games</button>
+    </div>
+
+    <!-- ─── REGISTRATIONS PANEL ─────────────────────────────── -->
+    <div id="panel-regs" class="panel active">
+      <div class="filter-bar">
+        <input class="search-input" type="text" placeholder="Search name, phone, code…" oninput="renderRegs()" id="reg-search"/>
+        <button class="filter-chip active" onclick="setRF('all',this)">All</button>
+        <button class="filter-chip" onclick="setRF('pending',this)">⏳ Pending</button>
+        <button class="filter-chip" onclick="setRF('approved',this)">✅ Approved</button>
+        <button class="filter-chip" onclick="setRF('rejected',this)">❌ Rejected</button>
+        <button class="export-btn" onclick="exportCSV()">⬇ Export All</button>
+      </div>
+      <div id="regs-container"></div>
+    </div>
+
+    <!-- ─── GAMES PANEL ──────────────────────────────────────── -->
+    <div id="panel-games" class="panel">
+
+      <!-- Add/Edit form -->
+      <div class="form-card" id="game-form-card">
+        <h3 id="game-form-title">➕ Add New Game</h3>
+        <input type="hidden" id="edit-game-id"/>
+        <div class="form-grid">
+          <div class="ff" style="grid-column:1/-1"><label>Game Name</label><input type="text" id="ng-name" placeholder="e.g. Friday Night Clash"/></div>
+          <div class="ff" style="grid-column:1/-1"><label>Location</label><input type="text" id="ng-loc" placeholder="e.g. CMC Field, Addis Ababa"/></div>
+          <div class="ff"><label>Date</label><input type="date" id="ng-date"/></div>
+          <div class="ff"><label>Time</label><input type="time" id="ng-time"/></div>
+          <div class="ff"><label>Price per Player (ETB)</label><input type="number" id="ng-price" placeholder="150"/></div>
+          <div class="ff"><label>Max Spots</label><input type="number" id="ng-spots" placeholder="20"/></div>
+          <div class="ff"><label>Format</label>
+            <select id="ng-format"><option>5-a-side</option><option>6-a-side</option><option>7-a-side</option><option>8-a-side</option>
+<option>9-a-side</option><option>10-a-side</option><option>11-a-side</option></select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="create-btn" onclick="saveGame()" id="save-game-btn">+ Add Game</button>
+          <button class="cancel-btn" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">Cancel</button>
+        </div>
+      </div>
+
+      <div id="games-admin-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: Review Screenshot -->
+<div class="modal-bg" id="review-modal">
+  <div class="modal">
+    <h3>Review Payment Screenshot</h3>
+    <div id="review-body"></div>
+    <div class="modal-foot">
+      <button class="modal-btn mb-cancel" onclick="closeModal('review-modal')">Close</button>
+      <button class="modal-btn mb-reject" id="modal-reject-btn">Reject</button>
+      <button class="modal-btn mb-approve" id="modal-approve-btn">✅ Approve</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Reject Reason -->
+<div class="modal-bg" id="reject-modal">
+  <div class="modal">
+    <h3>Reject Registration</h3>
+    <p style="font-size:13px;color:var(--c-text-2);line-height:1.5">Provide a reason so the player knows what to fix when resubmitting on Telegram.</p>
+    <textarea class="reason-input" id="reject-reason" placeholder="e.g. Screenshot is unclear, wrong amount transferred, wrong account…"></textarea>
+    <input type="hidden" id="reject-reg-id"/>
+    <div class="modal-foot">
+      <button class="modal-btn mb-cancel" onclick="closeModal('reject-modal')">Cancel</button>
+      <button class="modal-btn mb-reject" onclick="submitReject()">Confirm Reject</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var token     = localStorage.getItem('afm_admin_token') || null;
+var regsData  = [];
+var gamesData = [];
+var statsData = {};
+var regFilter = 'all';
+var reviewRegId = null;
+
+/* ── AUTH ──────────────────────────────────────────────────────────── */
+async function doLogin() {
+  var errEl = document.getElementById('login-err');
+  var btn   = document.getElementById('login-btn');
+  errEl.classList.remove('show');
+  btn.innerHTML = '<div class="spinner" style="border-top-color:#fff"></div>'; btn.disabled = true;
+  try {
+    var r = await api(API+'/api/admin/login','POST',{password:document.getElementById('lf-pass').value},false);
+    token = r.token; localStorage.setItem('afm_admin_token',token);
+    showDash();
+  } catch(e) { errEl.textContent = e.message; errEl.classList.add('show'); }
+  finally { btn.textContent = 'Login'; btn.disabled = false; }
+}
+
+function doLogout() {
+  token = null; localStorage.removeItem('afm_admin_token');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+async function checkAuth() {
+  if (!token) return;
+  try { await api(API+'/api/admin/stats','GET',null,true); showDash(); }
+  catch { token = null; localStorage.removeItem('afm_admin_token'); }
+}
+
+/* ── DASHBOARD ─────────────────────────────────────────────────────── */
+async function showDash() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display    = 'block';
+  await loadAll();
+  setInterval(loadAll, 30000);
+}
+
+async function loadAll() { await Promise.all([loadStats(), loadRegs(), loadGames()]); }
+
+async function loadStats() {
+  try {
+    var r = await api(API+'/api/admin/stats','GET',null,true);
+    statsData = r;
+    document.getElementById('s-rev').textContent      = (r.revenue||0).toLocaleString()+' ETB';
+    document.getElementById('s-players').textContent  = r.totalPlayers||0;
+    document.getElementById('s-approved').textContent = r.approvedCount||0;
+    document.getElementById('s-pending').textContent  = r.pendingCount||0;
+    var pb = document.getElementById('pending-badge'); var pc = document.getElementById('pending-cnt');
+    var tb = document.getElementById('tab-badge');
+    if (r.pendingCount > 0) { pb.style.display='block'; pc.textContent=r.pendingCount; tb.textContent=r.pendingCount; tb.style.display='inline-flex'; }
+    else { pb.style.display='none'; tb.style.display='none'; }
+  } catch(e) { console.error(e); }
+}
+
+async function loadRegs() {
+  try {
+    var r = await api(API+'/api/registrations','GET',null,true);
+    regsData = r.registrations;
+    renderRegs();
+  } catch(e) { console.error(e); }
+}
+
+async function loadGames() {
+  try {
+    var r = await api(API+'/api/games','GET',null,false);
+    gamesData = r.games;
+    renderGamesAdmin();
+  } catch(e) { console.error(e); }
+}
+
+/* ── TABS ──────────────────────────────────────────────────────────── */
+function showTab(t, btn) {
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('panel-'+t).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── REGISTRATIONS ─────────────────────────────────────────────────── */
+function setRF(f,btn) {
+  regFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
+  btn.classList.add('active');
+  renderRegs();
+}
+
+function renderRegs() {
+  var q = (document.getElementById('reg-search').value||'').toLowerCase();
+  var list = regsData.filter(function(r) {
+    var sf = regFilter==='all' || r.status===regFilter;
+    var qm = !q || (r.player?.fullName||'').toLowerCase().includes(q) || (r.player?.phone||'').includes(q) || (r.code||'').toLowerCase().includes(q);
+    return sf && qm;
+  });
+
+  var c = document.getElementById('regs-container');
+  c.innerHTML = '';
+
+  if (!gamesData.length && !list.length) { c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--c-text-3)">No registrations yet.</div>'; return; }
+
+  // Group by game
+  var seenGames = [];
+  list.forEach(function(r){ if (!seenGames.includes(r.gameId)) seenGames.push(r.gameId); });
+
+  seenGames.forEach(function(gameId) {
+    var game     = gamesData.find(function(g){return g.id===gameId;}) || (list.find(function(r){return r.gameId===gameId;})||{}).game || {};
+    var gameRegs = list.filter(function(r){return r.gameId===gameId;});
+    var approvedPlayers = gameRegs.filter(function(r){return r.status==='approved';}).reduce(function(s,r){return s+r.playerCount;},0);
+    var pendingCount    = gameRegs.filter(function(r){return r.status==='pending';}).length;
+    var revenue         = gameRegs.filter(function(r){return r.status==='approved';}).reduce(function(s,r){return s+r.totalAmount;},0);
+
+    var sec = document.createElement('div');
+    sec.className = 'game-section';
+    sec.innerHTML =
+      '<div class="game-section-header">' +
+        '<div class="gsh-info">' +
+          '<div class="g-name">'+esc(game.name||'Unknown Game')+'</div>' +
+          '<div class="g-meta"><span>📅 '+fmtDate(game.date)+'</span><span>⏰ '+fmtTime(game.time)+'</span><span>📍 '+esc((game.location||'').split(',')[0])+'</span></div>' +
+        '</div>' +
+        '<div class="gsh-stats">' +
+          '<div class="gsh-stat"><div class="v v-green">'+approvedPlayers+'</div><div class="l">Confirmed</div></div>' +
+          '<div class="gsh-stat"><div class="v v-amber">'+pendingCount+'</div><div class="l">Pending</div></div>' +
+          '<div class="gsh-stat"><div class="v">'+revenue.toLocaleString()+'</div><div class="l">ETB</div></div>' +
+        '</div>' +
+        '<div class="gsh-actions">' +
+          '<button class="btn-export-sm" onclick="exportCSV(\''+gameId+'\')">⬇ Export CSV</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="table-wrap">'+buildTable(gameRegs)+'</div>';
+    c.appendChild(sec);
+  });
+}
+
+function buildTable(regs) {
+  var html = '<table><thead><tr><th>Name</th><th>Phone</th><th>Age</th><th>Players</th><th>Amount</th><th>Status</th><th>Code</th><th>Actions</th></tr></thead><tbody>';
+  if (!regs.length) { html += '<tr class="empty-row"><td colspan="8">No registrations.</td></tr>'; }
+  else {
+    regs.forEach(function(r) {
+      var pClass = {approved:'pill-approved',pending:'pill-pending',rejected:'pill-rejected'}[r.status]||'pill-pending';
+      var pLabel = {approved:'✓ Approved',pending:'⏳ Pending',rejected:'❌ Rejected'}[r.status]||r.status;
+      var actions =
+        (r.status!=='approved' ? '<button class="btn btn-approve" onclick="approveReg(\''+r.id+'\')">Approve</button>' : '') +
+        (r.status!=='rejected' ? '<button class="btn btn-reject" onclick="openReject(\''+r.id+'\')">Reject</button>' : '') +
+        '<button class="btn btn-delete" onclick="deleteReg(\''+r.id+'\')">Delete</button>';
+      html += '<tr>' +
+        '<td><strong>'+esc(r.player?.fullName||'—')+'</strong></td>' +
+        '<td>'+esc(r.player?.phone||'—')+'</td>' +
+        '<td>'+(r.player?.age||'—')+'</td>' +
+        '<td style="font-weight:600">'+r.playerCount+'</td>' +
+        '<td style="font-weight:600">'+r.totalAmount+' ETB</td>' +
+        '<td><span class="pill '+pClass+'">'+pLabel+'</span></td>' +
+        '<td class="mono">'+r.code+'</td>' +
+        '<td><div style="display:flex;gap:4px;flex-wrap:wrap">'+actions+'</div></td>' +
+      '</tr>';
+    });
+  }
+  return html + '</tbody></table>';
+}
+
+/* ── APPROVE / REJECT / DELETE ─────────────────────────────────────── */
+async function approveReg(id) {
+  try { await api(API+'/api/registrations/'+id+'/approve','PATCH',{},true); await loadAll(); toast('✅ Approved'); }
+  catch(e) { toast('Error: '+e.message); }
+}
+
+function openReject(id) {
+  document.getElementById('reject-reg-id').value = id;
+  document.getElementById('reject-reason').value = '';
+  document.getElementById('reject-modal').classList.add('open');
+}
+
+async function submitReject() {
+  var id     = document.getElementById('reject-reg-id').value;
+  var reason = document.getElementById('reject-reason').value.trim() || 'Payment not verified';
+  try { await api(API+'/api/registrations/'+id+'/reject','PATCH',{reason:reason},true); closeModal('reject-modal'); await loadAll(); toast('Rejected'); }
+  catch(e) { toast('Error: '+e.message); }
+}
+
+async function deleteReg(id) {
+  if (!confirm('Delete this registration permanently?')) return;
+  try { await api(API+'/api/registrations/'+id,'DELETE',null,true); await loadAll(); toast('Deleted'); }
+  catch(e) { toast('Error: '+e.message); }
+}
+
+/* ── EXPORT ────────────────────────────────────────────────────────── */
+function exportCSV(gameId) {
+  var url = API+'/api/registrations/export/csv'+(gameId?'?gameId='+gameId:'');
+  fetch(url,{headers:{Authorization:'Bearer '+token}})
+    .then(function(r){
+      if(!r.ok) throw new Error('Export failed');
+      var cd=r.headers.get('Content-Disposition')||''; var fn=(cd.match(/filename="(.+?)"/))||['','attendance.csv'];
+      return r.blob().then(function(b){return{b:b,n:fn[1]};});
+    })
+    .then(function(d){ var u=URL.createObjectURL(d.b); var a=document.createElement('a'); a.href=u; a.download=d.n; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); toast('📥 CSV downloaded'); })
+    .catch(function(e){ toast('Error: '+e.message); });
+}
+
+/* ── GAMES ADMIN ───────────────────────────────────────────────────── */
+function renderGamesAdmin() {
+  var c = document.getElementById('games-admin-list');
+  if (!gamesData.length) { c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--c-text-3)">No games yet. Add one above.</div>'; return; }
+  c.innerHTML = '';
+  gamesData.forEach(function(g) {
+    var gameRegs     = regsData.filter(function(r){return r.gameId===g.id;});
+    var approved     = gameRegs.filter(function(r){return r.status==='approved';});
+    var approvedPl   = approved.reduce(function(s,r){return s+r.playerCount;},0);
+    var revenue      = approved.reduce(function(s,r){return s+r.totalAmount;},0);
+    var regOpen      = g.registrationOpen;
+    var pillClass    = regOpen ? 'pill-open' : 'pill-closed';
+    var pillLabel    = regOpen ? 'Open' : 'Closed';
+    var spotsLeft    = Math.max(0, g.maxSpots - (g.approvedSpots||0));
+
+    var div = document.createElement('div');
+    div.className = 'game-admin-card';
+    div.innerHTML =
+      '<div class="gac-top">' +
+        '<div>' +
+          '<div class="gac-name">'+esc(g.name)+'</div>' +
+          '<span class="pill '+pillClass+'" style="margin-top:4px;display:inline-flex">'+pillLabel+'</span>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+          '<button class="btn btn-edit" onclick="openEditGame(\''+g.id+'\')">✏️ Edit</button>' +
+          (regOpen
+            ? '<button class="btn btn-close" onclick="toggleReg(\''+g.id+'\',false)">🔒 Close Registration</button>'
+            : '<button class="btn btn-reopen" onclick="toggleReg(\''+g.id+'\',true)">🔓 Reopen Registration</button>') +
+          '<button class="btn btn-delete" onclick="deleteGame(\''+g.id+'\')">Delete</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="gac-meta">' +
+        '<span>📅 '+fmtDate(g.date)+' · '+fmtDay(g.date)+'</span>' +
+        '<span>⏰ '+fmtTime(g.time)+'</span>' +
+        '<span>📍 '+esc(g.location.split(',')[0])+'</span>' +
+        '<span>👟 '+esc(g.format)+'</span>' +
+      '</div>' +
+      '<div class="gac-bottom">' +
+        '<div class="gac-stats">' +
+          '<span>✅ <span class="sv">'+approvedPl+'</span> confirmed</span>' +
+          '<span>🪑 <span class="sv">'+spotsLeft+'/'+g.maxSpots+'</span> spots left</span>' +
+          '<span>💰 <span class="sv">'+revenue.toLocaleString()+'</span> ETB</span>' +
+          '<span>💵 <span class="sv">'+g.pricePerPlayer+'</span> ETB/player</span>' +
+        '</div>' +
+        '<button class="btn-export-sm" onclick="exportCSV(\''+g.id+'\')">⬇ Export CSV</button>' +
+      '</div>';
+    c.appendChild(div);
+  });
+}
+
+/* ── ADD / EDIT GAME ───────────────────────────────────────────────── */
+function openEditGame(gameId) {
+  var g = gamesData.find(function(x){return x.id===gameId;});
+  if (!g) return;
+  document.getElementById('edit-game-id').value = gameId;
+  document.getElementById('ng-name').value   = g.name;
+  document.getElementById('ng-loc').value    = g.location;
+  document.getElementById('ng-date').value   = g.date;
+  document.getElementById('ng-time').value   = g.time;
+  document.getElementById('ng-price').value  = g.pricePerPlayer;
+  document.getElementById('ng-spots').value  = g.maxSpots;
+  document.getElementById('ng-format').value = g.format;
+  document.getElementById('game-form-title').textContent  = '✏️ Edit Game';
+  document.getElementById('save-game-btn').textContent    = 'Save Changes';
+  document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+  // Switch to games tab and scroll to form
+  document.querySelectorAll('.tab-btn')[1].click();
+  document.getElementById('game-form-card').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelEdit() {
+  document.getElementById('edit-game-id').value = '';
+  ['ng-name','ng-loc','ng-date','ng-time','ng-price','ng-spots'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('ng-format').value             = '5-a-side';
+  document.getElementById('game-form-title').textContent = '➕ Add New Game';
+  document.getElementById('save-game-btn').textContent   = '+ Add Game';
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+}
+
+async function saveGame() {
+  var id    = document.getElementById('edit-game-id').value;
+  var name  = document.getElementById('ng-name').value.trim();
+  var loc   = document.getElementById('ng-loc').value.trim();
+  var date  = document.getElementById('ng-date').value;
+  var time  = document.getElementById('ng-time').value;
+  var price = document.getElementById('ng-price').value;
+  var spots = document.getElementById('ng-spots').value;
+  var fmt   = document.getElementById('ng-format').value;
+  if (!name||!loc||!date||!price||!spots) { toast('Fill all required fields'); return; }
+  var body  = {name,location:loc,date,time,pricePerPlayer:+price,format:fmt,maxSpots:+spots};
+  var btn   = document.getElementById('save-game-btn');
+  btn.innerHTML='<div class="spinner" style="border-top-color:#fff"></div>'; btn.disabled=true;
+  try {
+    if (id) {
+      await api(API+'/api/games/'+id,'PATCH',body,true);
+      toast('✅ Game updated');
+    } else {
+      await api(API+'/api/games','POST',body,true);
+      toast('✅ Game created');
+    }
+    cancelEdit(); await loadAll();
+  } catch(e) { toast('Error: '+e.message); }
+  finally { btn.innerHTML=id?'Save Changes':'+ Add Game'; btn.disabled=false; }
+}
+
+async function toggleReg(gameId, open) {
+  try { await api(API+'/api/games/'+gameId,'PATCH',{registrationOpen:open},true); await loadAll(); toast(open?'🔓 Registration reopened':'🔒 Registration closed'); }
+  catch(e) { toast('Error: '+e.message); }
+}
+
+async function deleteGame(gameId) {
+  if (!confirm('Delete this game? Player registrations will remain in the database.')) return;
+  try { await api(API+'/api/games/'+gameId,'DELETE',null,true); await loadAll(); toast('Deleted'); }
+  catch(e) { toast('Error: '+e.message); }
+}
+
+/* ── MODAL ─────────────────────────────────────────────────────────── */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(function(m){ m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('open');}); });
+
+/* ── UTILS ─────────────────────────────────────────────────────────── */
+function esc(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(d){ return d?new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—'; }
+function fmtDay(d) { return d?new Date(d+'T00:00:00').toLocaleDateString('en-US',{weekday:'short'}):''; }
+function fmtTime(t){ if(!t)return'—'; var p=t.split(':'),h=+p[0]; return(h%12||12)+':'+p[1]+' '+(h>=12?'PM':'AM'); }
+
+async function api(url,method,body,auth) {
+  var opts={method,headers:{'Content-Type':'application/json'}};
+  if(auth&&token) opts.headers['Authorization']='Bearer '+token;
+  if(body) opts.body=JSON.stringify(body);
+  var r=await fetch(url,opts); var d=await r.json();
+  if(!r.ok) throw new Error(d.error||'Request failed');
+  return d;
+}
+
+function toast(msg) {
+  var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
+}
+
+checkAuth();
+</script>
+</body>
+</html>

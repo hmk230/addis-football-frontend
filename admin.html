@@ -517,6 +517,17 @@ async function submitReject() {
   catch(e) { toast('Error: '+e.message); }
 }
 
+async function deleteAllRegs(gameId) {
+  var gameRegs = regsData.filter(function(r){ return r.gameId === gameId; });
+  if (!gameRegs.length) { toast('No registrations to delete'); return; }
+  if (!confirm('Delete all ' + gameRegs.length + ' registration(s) for this game? This cannot be undone.')) return;
+  try {
+    await Promise.all(gameRegs.map(function(r){ return api(API+'/api/registrations/'+r.id,'DELETE',null,true); }));
+    await loadAll();
+    toast('🗑 All registrations deleted');
+  } catch(e) { toast('Error: '+e.message); }
+}
+
 async function deleteReg(id) {
   if (!confirm('Delete this registration permanently?')) return;
   try { await api(API+'/api/registrations/'+id,'DELETE',null,true); await loadAll(); toast('Deleted'); }

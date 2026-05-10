@@ -518,7 +518,7 @@ async function submitReject() {
 }
 
 async function deleteAllRegs(gameId) {
-  var gameRegs = regsData.filter(function(r){ return r.gameId === gameId; });
+  var gameRegs = regsData.filter(function(r){ return r.gameId === gameId || r.game_id === gameId; });
   if (!gameRegs.length) { toast('No registrations to delete'); return; }
   if (!confirm('Delete all ' + gameRegs.length + ' registration(s) for this game? This cannot be undone.')) return;
   try {

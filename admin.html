@@ -101,7 +101,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;font-size:14px;background:v
 
 /* ── TABLE ──────────────────────────────────────────────────────────── */
 .table-wrap{overflow-x:auto;border:1px solid var(--c-border);border-radius:0 0 var(--radius) var(--radius)}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
 thead th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.5px;background:#f9fafb;border-bottom:1px solid var(--c-border);white-space:nowrap}
 tbody tr{border-bottom:1px solid #f3f4f6;transition:background .1s}
 tbody tr:last-child{border-bottom:none}
@@ -115,6 +115,7 @@ td strong{font-weight:600}
 .pill-rejected{background:var(--c-red-light);color:var(--c-red)}
 .pill-open{background:var(--c-green-light);color:var(--c-green-dark)}
 .pill-closed{background:#f3f4f6;color:var(--c-text-3)}
+.pill-monthly{background:#ede9fe;color:#7c3aed;border:1px solid #ddd6fe}
 .empty-row td{text-align:center;padding:28px;color:var(--c-text-3);font-size:13px}
 
 /* ── ACTION BUTTONS ─────────────────────────────────────────────────── */
@@ -129,6 +130,7 @@ td strong{font-weight:600}
 .btn-add{background:var(--c-green);color:#fff;font-size:13px;padding:8px 16px;border-radius:var(--radius-sm)}
 .btn-export-sm{background:var(--c-surface);color:var(--c-text-2);border:1px solid var(--c-border);font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .15s}
 .btn-export-sm:hover{border-color:var(--c-green);color:var(--c-green)}
+.btn-reset{background:#ede9fe;color:#7c3aed;border:none}
 
 /* ── ADD/EDIT GAME FORM ─────────────────────────────────────────────── */
 .form-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
@@ -140,7 +142,6 @@ td strong{font-weight:600}
 .ff input,.ff select{display:block;width:100%;padding:9px 12px;background:var(--c-bg);border:1.5px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--c-text);outline:none;transition:border-color .15s;appearance:none}
 .ff input:focus,.ff select:focus{border-color:var(--c-green);background:var(--c-surface)}
 .ff input::placeholder{color:var(--c-text-3)}
-.ff select option{background:var(--c-surface)}
 .form-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .create-btn{background:var(--c-green);color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
 .create-btn:hover{background:var(--c-green-dark)}
@@ -159,7 +160,6 @@ td strong{font-weight:600}
 .mb-approve{background:var(--c-green);color:#fff}
 .mb-reject{background:var(--c-red);color:#fff}
 .mb-save{background:var(--c-green);color:#fff}
-.ss-img{width:100%;border-radius:8px;border:1px solid var(--c-border);margin-bottom:12px;max-height:400px;object-fit:contain}
 .detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13px}
 .detail-row:last-child{border-bottom:none}
 .detail-row .dk{color:var(--c-text-2)}
@@ -178,6 +178,21 @@ td strong{font-weight:600}
 .gac-stats .sv{font-weight:700;color:var(--c-text)}
 .gac-actions{display:flex;gap:6px;flex-wrap:wrap}
 
+/* ── PASSWORD RESET SECTION ─────────────────────────────────────────── */
+.reset-requests-section{margin-top:32px}
+.reset-requests-section h2{font-size:16px;font-weight:700;letter-spacing:-.3px;margin-bottom:16px}
+.reset-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.reset-card-info .rc-name{font-size:14px;font-weight:600}
+.reset-card-info .rc-phone{font-size:12px;color:var(--c-text-2);margin-top:2px}
+.reset-card-info .rc-date{font-size:11px;color:var(--c-text-3);margin-top:2px}
+.reset-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.reset-pass-input{padding:7px 10px;border:1.5px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--c-text);outline:none;transition:border-color .15s;width:160px}
+.reset-pass-input:focus{border-color:#7c3aed}
+.reset-pass-input::placeholder{color:var(--c-text-3)}
+.reset-resolved-toggle{font-size:12px;color:var(--c-text-3);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;margin-bottom:10px;display:block}
+.resolved-list{display:none}
+.resolved-list.open{display:block}
+
 /* ── TOAST ──────────────────────────────────────────────────────────── */
 .toast{position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;font-size:13px;font-weight:500;padding:10px 16px;border-radius:8px;opacity:0;transition:all .25s;z-index:999;pointer-events:none;box-shadow:var(--shadow-md)}
 .toast.show{opacity:1}
@@ -188,7 +203,7 @@ td strong{font-weight:600}
 </style>
 </head>
 <body>
-<script>var API='https://addis-football-backend-production-bdb0.up.railway.app';</script>
+<script>var API='https://addis-football-backend-production.up.railway.app';</script>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -232,6 +247,7 @@ td strong{font-weight:600}
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('regs',this)">Registrations <span class="cnt" id="tab-badge" style="display:none">0</span></button>
       <button class="tab-btn" onclick="showTab('games',this)">Games</button>
+      <button class="tab-btn" onclick="showTab('resets',this)">Password Resets <span class="cnt" id="reset-badge" style="display:none">0</span></button>
     </div>
 
     <!-- ─── REGISTRATIONS PANEL ─────────────────────────────── -->
@@ -242,6 +258,8 @@ td strong{font-weight:600}
         <button class="filter-chip" onclick="setRF('pending',this)">⏳ Pending</button>
         <button class="filter-chip" onclick="setRF('approved',this)">✅ Approved</button>
         <button class="filter-chip" onclick="setRF('rejected',this)">❌ Rejected</button>
+        <button class="filter-chip" onclick="setRF('monthly',this)">📅 Monthly</button>
+        <button class="filter-chip" onclick="setRF('single',this)">🎟 Single</button>
         <button class="export-btn" onclick="exportCSV()">⬇ Export All</button>
       </div>
       <div id="regs-container"></div>
@@ -249,8 +267,6 @@ td strong{font-weight:600}
 
     <!-- ─── GAMES PANEL ──────────────────────────────────────── -->
     <div id="panel-games" class="panel">
-
-      <!-- Add/Edit form -->
       <div class="form-card" id="game-form-card">
         <h3 id="game-form-title">➕ Add New Game</h3>
         <input type="hidden" id="edit-game-id"/>
@@ -263,7 +279,7 @@ td strong{font-weight:600}
           <div class="ff"><label>Max Spots</label><input type="number" id="ng-spots" placeholder="20"/></div>
           <div class="ff"><label>Format</label>
             <select id="ng-format"><option>5-a-side</option><option>6-a-side</option><option>7-a-side</option><option>8-a-side</option>
-<option>9-a-side</option><option>10-a-side</option><option>11-a-side</option></select>
+              <option>9-a-side</option><option>10-a-side</option><option>11-a-side</option></select>
           </div>
         </div>
         <div class="form-actions">
@@ -271,23 +287,16 @@ td strong{font-weight:600}
           <button class="cancel-btn" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">Cancel</button>
         </div>
       </div>
-
       <div id="games-admin-list"></div>
     </div>
 
-  </div>
-</div>
-
-<!-- MODAL: Review Screenshot -->
-<div class="modal-bg" id="review-modal">
-  <div class="modal">
-    <h3>Review Payment Screenshot</h3>
-    <div id="review-body"></div>
-    <div class="modal-foot">
-      <button class="modal-btn mb-cancel" onclick="closeModal('review-modal')">Close</button>
-      <button class="modal-btn mb-reject" id="modal-reject-btn">Reject</button>
-      <button class="modal-btn mb-approve" id="modal-approve-btn">✅ Approve</button>
+    <!-- ─── PASSWORD RESETS PANEL ────────────────────────────── -->
+    <div id="panel-resets" class="panel">
+      <div id="resets-container">
+        <div style="text-align:center;padding:40px;color:var(--c-text-3)">Loading…</div>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -308,12 +317,12 @@ td strong{font-weight:600}
 <div class="toast" id="toast"></div>
 
 <script>
-var token     = localStorage.getItem('afm_admin_token') || null;
-var regsData  = [];
-var gamesData = [];
-var statsData = {};
-var regFilter = 'all';
-var reviewRegId = null;
+var token      = localStorage.getItem('afm_admin_token') || null;
+var regsData   = [];
+var gamesData  = [];
+var resetsData = [];
+var statsData  = {};
+var regFilter  = 'all';
 
 /* ── AUTH ──────────────────────────────────────────────────────────── */
 async function doLogin() {
@@ -325,65 +334,77 @@ async function doLogin() {
     var r = await api(API+'/api/admin/login','POST',{password:document.getElementById('lf-pass').value},false);
     token = r.token; localStorage.setItem('afm_admin_token',token);
     showDash();
-  } catch(e) { errEl.textContent = e.message; errEl.classList.add('show'); }
-  finally { btn.textContent = 'Login'; btn.disabled = false; }
+  } catch(e) { errEl.textContent=e.message; errEl.classList.add('show'); }
+  finally { btn.textContent='Login'; btn.disabled=false; }
 }
 
 function doLogout() {
-  token = null; localStorage.removeItem('afm_admin_token');
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
+  token=null; localStorage.removeItem('afm_admin_token');
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
 }
 
 async function checkAuth() {
   if (!token) return;
   try { await api(API+'/api/admin/stats','GET',null,true); showDash(); }
-  catch { token = null; localStorage.removeItem('afm_admin_token'); }
+  catch { token=null; localStorage.removeItem('afm_admin_token'); }
 }
 
 /* ── DASHBOARD ─────────────────────────────────────────────────────── */
 async function showDash() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display    = 'block';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('dashboard').style.display='block';
   await loadAll();
-  setInterval(loadAll, 30000);
+  setInterval(loadAll,30000);
 }
 
-async function loadAll() { await Promise.all([loadStats(), loadRegs(), loadGames()]); }
+async function loadAll() { await Promise.all([loadStats(),loadRegs(),loadGames(),loadResets()]); }
 
 async function loadStats() {
   try {
-    var r = await api(API+'/api/admin/stats','GET',null,true);
-    statsData = r;
-    document.getElementById('s-rev').textContent      = (r.revenue||0).toLocaleString()+' ETB';
-    document.getElementById('s-players').textContent  = r.totalPlayers||0;
-    document.getElementById('s-approved').textContent = r.approvedCount||0;
-    document.getElementById('s-pending').textContent  = r.pendingCount||0;
-    var pb = document.getElementById('pending-badge'); var pc = document.getElementById('pending-cnt');
-    var tb = document.getElementById('tab-badge');
-    if (r.pendingCount > 0) { pb.style.display='block'; pc.textContent=r.pendingCount; tb.textContent=r.pendingCount; tb.style.display='inline-flex'; }
+    var r=await api(API+'/api/admin/stats','GET',null,true);
+    statsData=r;
+    document.getElementById('s-rev').textContent      =(r.revenue||0).toLocaleString()+' ETB';
+    document.getElementById('s-players').textContent  =r.totalPlayers||0;
+    document.getElementById('s-approved').textContent =r.approvedCount||0;
+    document.getElementById('s-pending').textContent  =r.pendingCount||0;
+    var pb=document.getElementById('pending-badge'); var pc=document.getElementById('pending-cnt');
+    var tb=document.getElementById('tab-badge');
+    if (r.pendingCount>0) { pb.style.display='block'; pc.textContent=r.pendingCount; tb.textContent=r.pendingCount; tb.style.display='inline-flex'; }
     else { pb.style.display='none'; tb.style.display='none'; }
   } catch(e) { console.error(e); }
 }
 
 async function loadRegs() {
   try {
-    var r = await api(API+'/api/registrations','GET',null,true);
-    regsData = r.registrations;
+    var r=await api(API+'/api/registrations','GET',null,true);
+    regsData=r.registrations;
     renderRegs();
   } catch(e) { console.error(e); }
 }
 
 async function loadGames() {
   try {
-    var r = await api(API+'/api/games','GET',null,false);
-    gamesData = r.games;
+    var r=await api(API+'/api/games','GET',null,false);
+    gamesData=r.games;
     renderGamesAdmin();
   } catch(e) { console.error(e); }
 }
 
+async function loadResets() {
+  try {
+    var r=await api(API+'/api/admin/reset-requests','GET',null,true);
+    resetsData=r.requests || [];
+    renderResets();
+    var pending=resetsData.filter(function(x){return x.status==='pending';}).length;
+    var rb=document.getElementById('reset-badge');
+    if (pending>0) { rb.textContent=pending; rb.style.display='inline-flex'; }
+    else { rb.style.display='none'; }
+  } catch(e) { console.error(e); }
+}
+
 /* ── TABS ──────────────────────────────────────────────────────────── */
-function showTab(t, btn) {
+function showTab(t,btn) {
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('panel-'+t).classList.add('active');
@@ -392,82 +413,89 @@ function showTab(t, btn) {
 
 /* ── REGISTRATIONS ─────────────────────────────────────────────────── */
 function setRF(f,btn) {
-  regFilter = f;
+  regFilter=f;
   document.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
   btn.classList.add('active');
   renderRegs();
 }
 
 function renderRegs() {
-  var q = (document.getElementById('reg-search').value||'').toLowerCase();
-  var list = regsData.filter(function(r) {
-    var sf = regFilter==='all' || r.status===regFilter;
-    var qm = !q || (r.player?.fullName||'').toLowerCase().includes(q) || (r.player?.phone||'').includes(q) || (r.code||'').toLowerCase().includes(q);
-    return sf && qm;
+  var q=(document.getElementById('reg-search').value||'').toLowerCase();
+  var list=regsData.filter(function(r) {
+    var sf = regFilter==='all'     ? true :
+             regFilter==='monthly' ? r.bookingType==='monthly' :
+             regFilter==='single'  ? r.bookingType!=='monthly' :
+             r.status===regFilter;
+    var qm=!q||(r.player?.fullName||'').toLowerCase().includes(q)||(r.player?.phone||'').includes(q)||(r.code||'').toLowerCase().includes(q);
+    return sf&&qm;
   });
 
-  var c = document.getElementById('regs-container');
-  c.innerHTML = '';
-
-  if (!gamesData.length && !list.length) { c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--c-text-3)">No registrations yet.</div>'; return; }
+  var c=document.getElementById('regs-container');
+  c.innerHTML='';
+  if (!list.length) { c.innerHTML='<div style="text-align:center;padding:40px;color:var(--c-text-3)">No registrations found.</div>'; return; }
 
   // Group by game
-  var seenGames = [];
-  list.forEach(function(r){ if (!seenGames.includes(r.gameId)) seenGames.push(r.gameId); });
+  var seenGames=[];
+  list.forEach(function(r){ if(!seenGames.includes(r.gameId)) seenGames.push(r.gameId); });
 
   seenGames.forEach(function(gameId) {
-    var game     = gamesData.find(function(g){return g.id===gameId;}) || (list.find(function(r){return r.gameId===gameId;})||{}).game || {};
-    var gameRegs = list.filter(function(r){return r.gameId===gameId;});
-    var approvedPlayers = gameRegs.filter(function(r){return r.status==='approved';}).reduce(function(s,r){return s+r.playerCount;},0);
-    var pendingCount    = gameRegs.filter(function(r){return r.status==='pending';}).length;
-    var revenue         = gameRegs.filter(function(r){return r.status==='approved';}).reduce(function(s,r){return s+r.totalAmount;},0);
+    var game     =gamesData.find(function(g){return g.id===gameId;})||{};
+    var gameRegs =list.filter(function(r){return r.gameId===gameId;});
+    var approvedPl=gameRegs.filter(function(r){return r.status==='approved';}).reduce(function(s,r){return s+r.playerCount;},0);
+    var pendingCnt=gameRegs.filter(function(r){return r.status==='pending';}).length;
+    var revenue   =gameRegs.filter(function(r){return r.status==='approved';}).reduce(function(s,r){return s+r.totalAmount;},0);
 
-    var sec = document.createElement('div');
-    sec.className = 'game-section';
-    sec.innerHTML =
-      '<div class="game-section-header">' +
-        '<div class="gsh-info">' +
-          '<div class="g-name">'+esc(game.name||'Unknown Game')+'</div>' +
-          '<div class="g-meta"><span>📅 '+fmtDate(game.date)+'</span><span>⏰ '+fmtTime(game.time)+'</span><span>📍 '+esc((game.location||'').split(',')[0])+'</span></div>' +
-        '</div>' +
-        '<div class="gsh-stats">' +
-          '<div class="gsh-stat"><div class="v v-green">'+approvedPlayers+'</div><div class="l">Confirmed</div></div>' +
-          '<div class="gsh-stat"><div class="v v-amber">'+pendingCount+'</div><div class="l">Pending</div></div>' +
-          '<div class="gsh-stat"><div class="v">'+revenue.toLocaleString()+'</div><div class="l">ETB</div></div>' +
-        '</div>' +
-        '<div class="gsh-actions">' +
-          '<button class="btn-export-sm" onclick="exportCSV(\''+gameId+'\')">⬇ Export CSV</button>' +
-        '</div>' +
-      '</div>' +
+    var sec=document.createElement('div');
+    sec.className='game-section';
+    sec.innerHTML=
+      '<div class="game-section-header">'+
+        '<div class="gsh-info">'+
+          '<div class="g-name">'+esc(game.name||'Unknown Game')+'</div>'+
+          '<div class="g-meta"><span>📅 '+fmtDate(game.date)+'</span><span>⏰ '+fmtTime(game.time)+'</span><span>📍 '+esc((game.location||'').split(',')[0])+'</span></div>'+
+        '</div>'+
+        '<div class="gsh-stats">'+
+          '<div class="gsh-stat"><div class="v v-green">'+approvedPl+'</div><div class="l">Confirmed</div></div>'+
+          '<div class="gsh-stat"><div class="v v-amber">'+pendingCnt+'</div><div class="l">Pending</div></div>'+
+          '<div class="gsh-stat"><div class="v">'+revenue.toLocaleString()+'</div><div class="l">ETB</div></div>'+
+        '</div>'+
+        '<div class="gsh-actions">'+
+          '<button class="btn-export-sm" onclick="exportCSV(\''+gameId+'\')">⬇ Export CSV</button>'+
+        '</div>'+
+      '</div>'+
       '<div class="table-wrap">'+buildTable(gameRegs)+'</div>';
     c.appendChild(sec);
   });
 }
 
 function buildTable(regs) {
-  var html = '<table><thead><tr><th>Name</th><th>Phone</th><th>Age</th><th>Players</th><th>Amount</th><th>Status</th><th>Code</th><th>Actions</th></tr></thead><tbody>';
-  if (!regs.length) { html += '<tr class="empty-row"><td colspan="8">No registrations.</td></tr>'; }
+  var html='<table><thead><tr><th>Name</th><th>Phone</th><th>Age</th><th>Booking</th><th>Players</th><th>Amount</th><th>Status</th><th>Code</th><th>Actions</th></tr></thead><tbody>';
+  if (!regs.length) { html+='<tr class="empty-row"><td colspan="9">No registrations.</td></tr>'; }
   else {
     regs.forEach(function(r) {
-      var pClass = {approved:'pill-approved',pending:'pill-pending',rejected:'pill-rejected'}[r.status]||'pill-pending';
-      var pLabel = {approved:'✓ Approved',pending:'⏳ Pending',rejected:'❌ Rejected'}[r.status]||r.status;
-      var actions =
-        (r.status!=='approved' ? '<button class="btn btn-approve" onclick="approveReg(\''+r.id+'\')">Approve</button>' : '') +
-        (r.status!=='rejected' ? '<button class="btn btn-reject" onclick="openReject(\''+r.id+'\')">Reject</button>' : '') +
+      var pClass={approved:'pill-approved',pending:'pill-pending',rejected:'pill-rejected'}[r.status]||'pill-pending';
+      var pLabel={approved:'✓ Approved',pending:'⏳ Pending',rejected:'❌ Rejected'}[r.status]||r.status;
+      var isMonthly=r.bookingType==='monthly';
+      var bookingCell=isMonthly
+        ? '<span class="pill pill-monthly">📅 Monthly</span><br><span style="font-size:10px;color:var(--c-text-3);margin-top:2px;display:block">4-week recurring</span>'
+        : '<span style="font-size:12px;color:var(--c-text-3)">🎟 Single</span>';
+      var actions=
+        (r.status!=='approved'?'<button class="btn btn-approve" onclick="approveReg(\''+r.id+'\')">Approve</button>':'')+
+        (r.status!=='rejected'?'<button class="btn btn-reject" onclick="openReject(\''+r.id+'\')">Reject</button>':'')+
         '<button class="btn btn-delete" onclick="deleteReg(\''+r.id+'\')">Delete</button>';
-      html += '<tr>' +
-        '<td><strong>'+esc(r.player?.fullName||'—')+'</strong></td>' +
-        '<td>'+esc(r.player?.phone||'—')+'</td>' +
-        '<td>'+(r.player?.age||'—')+'</td>' +
-        '<td style="font-weight:600">'+r.playerCount+'</td>' +
-        '<td style="font-weight:600">'+r.totalAmount+' ETB</td>' +
-        '<td><span class="pill '+pClass+'">'+pLabel+'</span></td>' +
-        '<td class="mono">'+r.code+'</td>' +
-        '<td><div style="display:flex;gap:4px;flex-wrap:wrap">'+actions+'</div></td>' +
+      html+='<tr'+( isMonthly?' style="background:#faf5ff"':'')+'>'+
+        '<td><strong>'+esc(r.player?.fullName||'—')+'</strong></td>'+
+        '<td>'+esc(r.player?.phone||'—')+'</td>'+
+        '<td>'+(r.player?.age||'—')+'</td>'+
+        '<td>'+bookingCell+'</td>'+
+        '<td style="font-weight:600">'+r.playerCount+'</td>'+
+        '<td style="font-weight:600">'+r.totalAmount+' ETB</td>'+
+        '<td><span class="pill '+pClass+'">'+pLabel+'</span></td>'+
+        '<td class="mono">'+r.code+'</td>'+
+        '<td><div style="display:flex;gap:4px;flex-wrap:wrap">'+actions+'</div></td>'+
       '</tr>';
     });
   }
-  return html + '</tbody></table>';
+  return html+'</tbody></table>';
 }
 
 /* ── APPROVE / REJECT / DELETE ─────────────────────────────────────── */
@@ -477,14 +505,14 @@ async function approveReg(id) {
 }
 
 function openReject(id) {
-  document.getElementById('reject-reg-id').value = id;
-  document.getElementById('reject-reason').value = '';
+  document.getElementById('reject-reg-id').value=id;
+  document.getElementById('reject-reason').value='';
   document.getElementById('reject-modal').classList.add('open');
 }
 
 async function submitReject() {
-  var id     = document.getElementById('reject-reg-id').value;
-  var reason = document.getElementById('reject-reason').value.trim() || 'Payment not verified';
+  var id    =document.getElementById('reject-reg-id').value;
+  var reason=document.getElementById('reject-reason').value.trim()||'Payment not verified';
   try { await api(API+'/api/registrations/'+id+'/reject','PATCH',{reason:reason},true); closeModal('reject-modal'); await loadAll(); toast('Rejected'); }
   catch(e) { toast('Error: '+e.message); }
 }
@@ -497,7 +525,7 @@ async function deleteReg(id) {
 
 /* ── EXPORT ────────────────────────────────────────────────────────── */
 function exportCSV(gameId) {
-  var url = API+'/api/registrations/export/csv'+(gameId?'?gameId='+gameId:'');
+  var url=API+'/api/registrations/export/csv'+(gameId?'?gameId='+gameId:'');
   fetch(url,{headers:{Authorization:'Bearer '+token}})
     .then(function(r){
       if(!r.ok) throw new Error('Export failed');
@@ -510,118 +538,155 @@ function exportCSV(gameId) {
 
 /* ── GAMES ADMIN ───────────────────────────────────────────────────── */
 function renderGamesAdmin() {
-  var c = document.getElementById('games-admin-list');
-  if (!gamesData.length) { c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--c-text-3)">No games yet. Add one above.</div>'; return; }
-  c.innerHTML = '';
+  var c=document.getElementById('games-admin-list');
+  if (!gamesData.length) { c.innerHTML='<div style="text-align:center;padding:40px;color:var(--c-text-3)">No games yet. Add one above.</div>'; return; }
+  c.innerHTML='';
   gamesData.forEach(function(g) {
-    var gameRegs     = regsData.filter(function(r){return r.gameId===g.id;});
-    var approved     = gameRegs.filter(function(r){return r.status==='approved';});
-    var approvedPl   = approved.reduce(function(s,r){return s+r.playerCount;},0);
-    var revenue      = approved.reduce(function(s,r){return s+r.totalAmount;},0);
-    var regOpen      = g.registrationOpen;
-    var pillClass    = regOpen ? 'pill-open' : 'pill-closed';
-    var pillLabel    = regOpen ? 'Open' : 'Closed';
-    var spotsLeft    = Math.max(0, g.maxSpots - (g.approvedSpots||0));
-
-    var div = document.createElement('div');
-    div.className = 'game-admin-card';
-    div.innerHTML =
-      '<div class="gac-top">' +
-        '<div>' +
-          '<div class="gac-name">'+esc(g.name)+'</div>' +
-          '<span class="pill '+pillClass+'" style="margin-top:4px;display:inline-flex">'+pillLabel+'</span>' +
-        '</div>' +
-        '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
-          '<button class="btn btn-edit" onclick="openEditGame(\''+g.id+'\')">✏️ Edit</button>' +
-          (regOpen
-            ? '<button class="btn btn-close" onclick="toggleReg(\''+g.id+'\',false)">🔒 Close Registration</button>'
-            : '<button class="btn btn-reopen" onclick="toggleReg(\''+g.id+'\',true)">🔓 Reopen Registration</button>') +
-          '<button class="btn btn-delete" onclick="deleteGame(\''+g.id+'\')">Delete</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="gac-meta">' +
-        '<span>📅 '+fmtDate(g.date)+' · '+fmtDay(g.date)+'</span>' +
-        '<span>⏰ '+fmtTime(g.time)+'</span>' +
-        '<span>📍 '+esc(g.location.split(',')[0])+'</span>' +
-        '<span>👟 '+esc(g.format)+'</span>' +
-      '</div>' +
-      '<div class="gac-bottom">' +
-        '<div class="gac-stats">' +
-          '<span>✅ <span class="sv">'+approvedPl+'</span> confirmed</span>' +
-          '<span>🪑 <span class="sv">'+spotsLeft+'/'+g.maxSpots+'</span> spots left</span>' +
-          '<span>💰 <span class="sv">'+revenue.toLocaleString()+'</span> ETB</span>' +
-          '<span>💵 <span class="sv">'+g.pricePerPlayer+'</span> ETB/player</span>' +
-        '</div>' +
-        '<button class="btn-export-sm" onclick="exportCSV(\''+g.id+'\')">⬇ Export CSV</button>' +
+    var gameRegs  =regsData.filter(function(r){return r.gameId===g.id;});
+    var approved  =gameRegs.filter(function(r){return r.status==='approved';});
+    var approvedPl=approved.reduce(function(s,r){return s+r.playerCount;},0);
+    var revenue   =approved.reduce(function(s,r){return s+r.totalAmount;},0);
+    var regOpen   =g.registrationOpen;
+    var spotsLeft =Math.max(0,g.maxSpots-(g.approvedSpots||0));
+    var div=document.createElement('div');
+    div.className='game-admin-card';
+    div.innerHTML=
+      '<div class="gac-top">'+
+        '<div><div class="gac-name">'+esc(g.name)+'</div><span class="pill '+(regOpen?'pill-open':'pill-closed')+'" style="margin-top:4px;display:inline-flex">'+(regOpen?'Open':'Closed')+'</span></div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+          '<button class="btn btn-edit" onclick="openEditGame(\''+g.id+'\')">✏️ Edit</button>'+
+          (regOpen?'<button class="btn btn-close" onclick="toggleReg(\''+g.id+'\',false)">🔒 Close Registration</button>':'<button class="btn btn-reopen" onclick="toggleReg(\''+g.id+'\',true)">🔓 Reopen Registration</button>')+
+          '<button class="btn btn-delete" onclick="deleteGame(\''+g.id+'\')">Delete</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="gac-meta"><span>📅 '+fmtDate(g.date)+' · '+fmtDay(g.date)+'</span><span>⏰ '+fmtTime(g.time)+'</span><span>📍 '+esc(g.location.split(',')[0])+'</span><span>👟 '+esc(g.format)+'</span></div>'+
+      '<div class="gac-bottom">'+
+        '<div class="gac-stats">'+
+          '<span>✅ <span class="sv">'+approvedPl+'</span> confirmed</span>'+
+          '<span>🪑 <span class="sv">'+spotsLeft+'/'+g.maxSpots+'</span> spots left</span>'+
+          '<span>💰 <span class="sv">'+revenue.toLocaleString()+'</span> ETB</span>'+
+          '<span>💵 <span class="sv">'+g.pricePerPlayer+'</span> ETB/player</span>'+
+        '</div>'+
+        '<button class="btn-export-sm" onclick="exportCSV(\''+g.id+'\')">⬇ Export CSV</button>'+
       '</div>';
     c.appendChild(div);
   });
 }
 
-/* ── ADD / EDIT GAME ───────────────────────────────────────────────── */
 function openEditGame(gameId) {
-  var g = gamesData.find(function(x){return x.id===gameId;});
-  if (!g) return;
-  document.getElementById('edit-game-id').value = gameId;
-  document.getElementById('ng-name').value   = g.name;
-  document.getElementById('ng-loc').value    = g.location;
-  document.getElementById('ng-date').value   = g.date;
-  document.getElementById('ng-time').value   = g.time;
-  document.getElementById('ng-price').value  = g.pricePerPlayer;
-  document.getElementById('ng-spots').value  = g.maxSpots;
-  document.getElementById('ng-format').value = g.format;
-  document.getElementById('game-form-title').textContent  = '✏️ Edit Game';
-  document.getElementById('save-game-btn').textContent    = 'Save Changes';
-  document.getElementById('cancel-edit-btn').style.display = 'inline-block';
-  // Switch to games tab and scroll to form
+  var g=gamesData.find(function(x){return x.id===gameId;}); if(!g) return;
+  document.getElementById('edit-game-id').value=gameId;
+  document.getElementById('ng-name').value=g.name; document.getElementById('ng-loc').value=g.location;
+  document.getElementById('ng-date').value=g.date; document.getElementById('ng-time').value=g.time;
+  document.getElementById('ng-price').value=g.pricePerPlayer; document.getElementById('ng-spots').value=g.maxSpots;
+  document.getElementById('ng-format').value=g.format;
+  document.getElementById('game-form-title').textContent='✏️ Edit Game';
+  document.getElementById('save-game-btn').textContent='Save Changes';
+  document.getElementById('cancel-edit-btn').style.display='inline-block';
   document.querySelectorAll('.tab-btn')[1].click();
   document.getElementById('game-form-card').scrollIntoView({behavior:'smooth'});
 }
 
 function cancelEdit() {
-  document.getElementById('edit-game-id').value = '';
+  document.getElementById('edit-game-id').value='';
   ['ng-name','ng-loc','ng-date','ng-time','ng-price','ng-spots'].forEach(function(id){document.getElementById(id).value='';});
-  document.getElementById('ng-format').value             = '5-a-side';
-  document.getElementById('game-form-title').textContent = '➕ Add New Game';
-  document.getElementById('save-game-btn').textContent   = '+ Add Game';
-  document.getElementById('cancel-edit-btn').style.display = 'none';
+  document.getElementById('ng-format').value='5-a-side';
+  document.getElementById('game-form-title').textContent='➕ Add New Game';
+  document.getElementById('save-game-btn').textContent='+ Add Game';
+  document.getElementById('cancel-edit-btn').style.display='none';
 }
 
 async function saveGame() {
-  var id    = document.getElementById('edit-game-id').value;
-  var name  = document.getElementById('ng-name').value.trim();
-  var loc   = document.getElementById('ng-loc').value.trim();
-  var date  = document.getElementById('ng-date').value;
-  var time  = document.getElementById('ng-time').value;
-  var price = document.getElementById('ng-price').value;
-  var spots = document.getElementById('ng-spots').value;
-  var fmt   = document.getElementById('ng-format').value;
-  if (!name||!loc||!date||!price||!spots) { toast('Fill all required fields'); return; }
-  var body  = {name,location:loc,date,time,pricePerPlayer:+price,format:fmt,maxSpots:+spots};
-  var btn   = document.getElementById('save-game-btn');
+  var id=document.getElementById('edit-game-id').value;
+  var name=document.getElementById('ng-name').value.trim();
+  var loc=document.getElementById('ng-loc').value.trim();
+  var date=document.getElementById('ng-date').value;
+  var time=document.getElementById('ng-time').value;
+  var price=document.getElementById('ng-price').value;
+  var spots=document.getElementById('ng-spots').value;
+  var fmt=document.getElementById('ng-format').value;
+  if(!name||!loc||!date||!price||!spots){toast('Fill all required fields');return;}
+  var body={name,location:loc,date,time,pricePerPlayer:+price,format:fmt,maxSpots:+spots};
+  var btn=document.getElementById('save-game-btn');
   btn.innerHTML='<div class="spinner" style="border-top-color:#fff"></div>'; btn.disabled=true;
   try {
-    if (id) {
-      await api(API+'/api/games/'+id,'PATCH',body,true);
-      toast('✅ Game updated');
-    } else {
-      await api(API+'/api/games','POST',body,true);
-      toast('✅ Game created');
-    }
+    if(id){await api(API+'/api/games/'+id,'PATCH',body,true);toast('✅ Game updated');}
+    else  {await api(API+'/api/games','POST',body,true);toast('✅ Game created');}
     cancelEdit(); await loadAll();
-  } catch(e) { toast('Error: '+e.message); }
-  finally { btn.innerHTML=id?'Save Changes':'+ Add Game'; btn.disabled=false; }
+  } catch(e){toast('Error: '+e.message);}
+  finally{btn.innerHTML=id?'Save Changes':'+ Add Game';btn.disabled=false;}
 }
 
-async function toggleReg(gameId, open) {
-  try { await api(API+'/api/games/'+gameId,'PATCH',{registrationOpen:open},true); await loadAll(); toast(open?'🔓 Registration reopened':'🔒 Registration closed'); }
-  catch(e) { toast('Error: '+e.message); }
+async function toggleReg(gameId,open) {
+  try{await api(API+'/api/games/'+gameId,'PATCH',{registrationOpen:open},true);await loadAll();toast(open?'🔓 Registration reopened':'🔒 Registration closed');}
+  catch(e){toast('Error: '+e.message);}
 }
 
 async function deleteGame(gameId) {
-  if (!confirm('Delete this game? Player registrations will remain in the database.')) return;
-  try { await api(API+'/api/games/'+gameId,'DELETE',null,true); await loadAll(); toast('Deleted'); }
-  catch(e) { toast('Error: '+e.message); }
+  if(!confirm('Delete this game? Player registrations will remain in the database.'))return;
+  try{await api(API+'/api/games/'+gameId,'DELETE',null,true);await loadAll();toast('Deleted');}
+  catch(e){toast('Error: '+e.message);}
+}
+
+/* ── PASSWORD RESET REQUESTS ───────────────────────────────────────── */
+function renderResets() {
+  var c=document.getElementById('resets-container');
+  var pending =resetsData.filter(function(r){return r.status==='pending';});
+  var resolved=resetsData.filter(function(r){return r.status==='resolved';});
+
+  if (!resetsData.length) { c.innerHTML='<div style="text-align:center;padding:40px;color:var(--c-text-3)">No password reset requests.</div>'; return; }
+
+  var html='<h2>🔑 Password Reset Requests</h2>';
+
+  if (!pending.length) {
+    html+='<div style="text-align:center;padding:24px;color:var(--c-text-3);background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);margin-bottom:16px">No pending reset requests.</div>';
+  } else {
+    pending.forEach(function(req) {
+      html+=
+        '<div class="reset-card">'+
+          '<div class="reset-card-info">'+
+            '<div class="rc-name">'+esc(req.player?.fullName||'—')+'</div>'+
+            '<div class="rc-phone">📞 '+esc(req.player?.phone||'—')+'</div>'+
+            '<div class="rc-date">Requested: '+fmtDateTime(req.createdAt)+'</div>'+
+          '</div>'+
+          '<div class="reset-card-actions">'+
+            '<input class="reset-pass-input" type="text" id="rp-'+req.userId+'" placeholder="Temp password…"/>'+
+            '<button class="btn btn-reset" onclick="doResetPassword(\''+req.id+'\',\''+req.userId+'\')">🔑 Reset Password</button>'+
+          '</div>'+
+        '</div>';
+    });
+  }
+
+  if (resolved.length) {
+    html+=
+      '<button class="reset-resolved-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\');this.textContent=this.nextElementSibling.classList.contains(\'open\')?\'▴ Hide resolved ('+resolved.length+')\':\'▾ Show resolved ('+resolved.length+')\' ">▾ Show resolved ('+resolved.length+')</button>'+
+      '<div class="resolved-list">';
+    resolved.forEach(function(req) {
+      html+=
+        '<div class="reset-card" style="opacity:.6">'+
+          '<div class="reset-card-info">'+
+            '<div class="rc-name">'+esc(req.player?.fullName||'—')+'</div>'+
+            '<div class="rc-phone">📞 '+esc(req.player?.phone||'—')+'</div>'+
+            '<div class="rc-date">Resolved: '+fmtDateTime(req.resolvedAt)+'</div>'+
+          '</div>'+
+          '<span class="pill pill-approved">✓ Resolved</span>'+
+        '</div>';
+    });
+    html+='</div>';
+  }
+
+  c.innerHTML=html;
+}
+
+async function doResetPassword(requestId, userId) {
+  var input=document.getElementById('rp-'+userId);
+  var tempPass=(input?.value||'').trim();
+  if (!tempPass || tempPass.length<6) { toast('Enter a temp password (min 6 chars)'); return; }
+  try {
+    await api(API+'/api/admin/reset-password/'+userId,'PATCH',{tempPassword:tempPass,requestId:requestId},true);
+    toast('✅ Password reset. Player must change on next login.');
+    await loadResets();
+  } catch(e) { toast('Error: '+e.message); }
 }
 
 /* ── MODAL ─────────────────────────────────────────────────────────── */
@@ -633,6 +698,7 @@ function esc(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;
 function fmtDate(d){ return d?new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—'; }
 function fmtDay(d) { return d?new Date(d+'T00:00:00').toLocaleDateString('en-US',{weekday:'short'}):''; }
 function fmtTime(t){ if(!t)return'—'; var p=t.split(':'),h=+p[0]; return(h%12||12)+':'+p[1]+' '+(h>=12?'PM':'AM'); }
+function fmtDateTime(iso){ if(!iso)return'—'; var d=new Date(iso); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
 
 async function api(url,method,body,auth) {
   var opts={method,headers:{'Content-Type':'application/json'}};

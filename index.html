@@ -868,12 +868,12 @@ function recalc() {
   var box     = document.getElementById('total-box');
   if (!count || !currentGame) { box.style.display = 'none'; return; }
 
-  var isMonthly   = bookingType === 'monthly';
-  var basePrice   = currentGame.pricePerPlayer;
-  var discount    = isMonthly ? Math.round(basePrice * 0.5) : 0;
-  var pricePerPl  = isMonthly ? Math.round((basePrice * 4) - discount) : basePrice;
-  var total       = count * pricePerPl;
-  // For monthly: total = count * (basePrice*4 - basePrice*0.5), discount shown is per-player discount * count
+  var isMonthly      = bookingType === 'monthly';
+  var basePrice      = currentGame.pricePerPlayer;
+  var monthlyFull    = basePrice * 4;                          // shown as "Price per player (monthly)"
+  var discount       = Math.round(basePrice * 0.5);            // shown in discount row (flat, not × count)
+  var pricePerPl     = isMonthly ? monthlyFull : basePrice;
+  var total          = isMonthly ? (count * monthlyFull) - discount : count * basePrice;
 
   box.style.display = 'block';
   document.getElementById('tc-players').textContent     = count + ' player' + (count > 1 ? 's' : '');
@@ -884,7 +884,7 @@ function recalc() {
   var discRow = document.getElementById('tc-discount-row');
   if (isMonthly) {
     discRow.style.display = 'flex';
-    document.getElementById('tc-discount').textContent = '−' + (count * discount) + ' ETB';
+    document.getElementById('tc-discount').textContent = '−' + discount + ' ETB';
   } else {
     discRow.style.display = 'none';
   }

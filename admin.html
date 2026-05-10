@@ -460,6 +460,7 @@ function renderRegs() {
         '</div>'+
         '<div class="gsh-actions">'+
           '<button class="btn-export-sm" onclick="exportCSV(\''+gameId+'\')">⬇ Export CSV</button>'+
+'<button onclick="deleteAllRegs(\''+gameId+'\')" style="background:#fee2e2;color:#ef4444;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">🗑 Delete All</button>' +
         '</div>'+
       '</div>'+
       '<div class="table-wrap">'+buildTable(gameRegs)+'</div>';

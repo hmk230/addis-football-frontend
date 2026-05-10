@@ -32,7 +32,7 @@
   --shadow-md:0 4px 16px rgba(0,0,0,.10);
 }
 html,body{height:100%;font-family:'Inter',sans-serif;font-size:15px;background:var(--c-bg);color:var(--c-text);line-height:1.5}
-body{overflow-x:hidden;padding-bottom:100px}
+body{overflow-x:hidden;padding-bottom:160px}
 
 /* ── VIEWS ──────────────────────────────────────────────────────────── */
 .view{display:none;animation:fadeUp .22s ease}
@@ -498,8 +498,8 @@ body{overflow-x:hidden;padding-bottom:100px}
 
     <!-- Booking type indicator -->
     <div class="booking-type-bar">
-      <div class="bt-chip active" id="bt-single">🎟 Single Game</div>
-      <div class="bt-chip" id="bt-monthly">📅 Monthly – 4 Weeks</div>
+      <button class="bt-chip active" id="bt-single" onclick="switchBookingType('single')">🎟 Single Game</button>
+      <button class="bt-chip" id="bt-monthly" onclick="switchBookingType('monthly')">📅 Monthly – 4 Weeks</button>
     </div>
 
     <div class="form-section">
@@ -840,6 +840,26 @@ function openForm(gameId, type) {
   document.getElementById('form-err').style.display  = 'none';
   showView('form');
   navHighlight('games');
+}
+
+function switchBookingType(type) {
+  bookingType = type;
+  var isMonthly = type === 'monthly';
+  document.getElementById('bt-single').classList.toggle('active', !isMonthly);
+  document.getElementById('bt-monthly').classList.toggle('active', isMonthly);
+
+  // Update chip price display
+  var displayPrice = isMonthly
+    ? Math.round((currentGame.pricePerPlayer * 4) - (currentGame.pricePerPlayer * 0.5))
+    : currentGame.pricePerPlayer;
+  document.querySelector('#form-game-chip .chip-price .price').textContent = displayPrice;
+  document.querySelector('#form-game-chip .chip-price .per').textContent   = 'ETB/' + (isMonthly ? 'mo' : 'player');
+
+  document.getElementById('form-sub').textContent = isMonthly
+    ? '📅 Monthly booking — 4 weeks at a discounted rate'
+    : 'Fill in your details to reserve spots';
+
+  recalc();
 }
 
 function recalc() {

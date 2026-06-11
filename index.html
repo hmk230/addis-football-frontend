@@ -1,238 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>Addis Football Meetup</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-/* ── RESET & TOKENS ─────────────────────────────────────────────────── */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{\n  --c-bg:#f9fafb;\n  --c-surface:#ffffff;\n  --c-border:#e5e7eb;\n  --c-border-focus:#10b981;\n  --c-text:#111827;\n  --c-text-2:#6b7280;\n  --c-text-3:#9ca3af;\n  --c-green:#10b981;\n  --c-green-dark:#059669;\n  --c-green-light:#ecfdf5;\n  --c-green-mid:#d1fae5;\n  --c-amber:#f59e0b;\n  --c-amber-light:#fffbeb;\n  --c-red:#ef4444;\n}
-body{font-family:'Inter',sans-serif;background:var(--c-bg);color:var(--c-text);line-height:1.5;padding-bottom:80px}
-.view{display:none;padding:16px;max-width:600px;margin:0 auto}
-.view.active{display:block}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Addis Football Meetup</title>
+  
+  <!-- Telegram Web App Script Wrapper -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Modern Inter Font Typo -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ── SYSTEM DESIGN TOKENS ─────────────────────────────────────────── */
+    :root {
+      --c-bg: #f9fafb;
+      --c-surface: #ffffff;
+      --c-border: #e5e7eb;
+      --c-border-focus: #10b981;
+      --c-text: #111827;
+      --c-text-2: #4b5563;
+      --c-text-3: #9ca3af;
+      --c-green: #10b981;
+      --c-green-dark: #059669;
+      --c-green-light: #ecfdf5;
+      --c-green-mid: #d1fae5;
+      --c-red: #ef4444;
+      --c-red-light: #fef2f2;
+      --c-red-border: #fca5a5;
+    }
 
-/* ── VERIFICATION FORM STYLES ────────────────────────────────────────── */
-.verify-box{background:var(--c-surface);border:1px solid var(--c-border);border-radius:12px;padding:16px;margin-bottom:16px}
-.vb-title{font-size:16px;font-weight:700;margin-bottom:4px}
-.vb-sub{font-size:14px;color:var(--c-text-2);margin-bottom:16px}
-.bank-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.bank-tab{padding:10px;border:1px solid var(--c-border);background:#f3f4f6;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;color:var(--c-text-2);transition:all 0.2s}
-.bank-tab.active{background:var(--c-green-light);border-color:var(--c-green);color:var(--c-green-dark)}
-.verify-field{margin-bottom:14px}
-.verify-field label{display:block;font-size:12px;font-weight:600;color:var(--c-text-2);margin-bottom:6px}
-.verify-field input{width:100%;padding:12px;border:1px solid var(--c-border);border-radius:8px;font-size:14px;outline:none;transition:border-color 0.2s}
-.verify-field input:focus{border-color:var(--c-green)}
-.verify-btn{width:100%;padding:14px;background:var(--c-green);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.2s}
-.verify-btn:hover{background:var(--c-green-dark)}
-.verify-btn:disabled{background:var(--c-text-3);cursor:not-allowed}
-.verify-err{color:var(--c-red);font-size:13px;font-weight:500;margin-bottom:12px;display:none}
-.verify-err.show{display:block}
-.success-card{background:var(--c-green-light);border:1px solid var(--c-green-mid);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px}
-.sc-icon{font-size:32px;margin-bottom:8px}
-.sc-title{font-weight:700;color:var(--c-green-dark);margin-size:16px}
-.sc-sub{font-size:13px;color:var(--c-text-2)}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* Basic Spinner UI */
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin 1s ease-in-out infinite;margin-right:8px;vertical-align:middle}
-@keyframes spin{to{transform:rotate(360deg)}}
-</style>
+    body {
+      background-color: var(--c-bg);
+      color: var(--c-text);
+      line-height: 1.5;
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ── BASE UI CONTAINER CARDS ───────────────────────────────────────── */
+    .card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* Match header info block */
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .match-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .icon-wrapper {
+      background: #f3f4f6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .match-title {
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .match-meta {
+      font-size: 12px;
+      color: var(--c-text-3);
+    }
+    .price-tag {
+      text-align: right;
+    }
+    .price-num {
+      font-weight: 700;
+      color: var(--c-green);
+      font-size: 16px;
+    }
+    .price-lbl {
+      font-size: 11px;
+      color: var(--c-text-3);
+    }
+
+    /* Toggle booking switcher segment */
+    .booking-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f3f4f6;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .b-tab {
+      border: none;
+      background: transparent;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--c-text-2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .b-tab.active {
+      background: var(--c-surface);
+      color: var(--c-text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* Runtime execution errors displaying zone */
+    .err-banner {
+      background: var(--c-red-light);
+      border: 1px solid var(--c-red-border);
+      color: var(--c-red);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* Selector Field styling options */
+    .input-label {
+      font-size: 12px;
+      color: var(--c-text-2);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .select-box {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--c-border);
+      border-radius: 10px;
+      background: var(--c-surface);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 16px;
+    }
+
+    /* Summary Breakdowns */
+    .summary-box {
+      background: var(--c-green-light);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--c-text-2);
+      margin-bottom: 6px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: 700;
+      border-top: 1px solid var(--c-green-mid);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+
+    /* ── VERIFICATION ELEMENT DESIGN ──────────────────────────────────── */
+    .verify-box {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: none; /* Triggers explicitly on runtime registration success loop */
+    }
+    .vb-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .vb-sub {
+      font-size: 13px;
+      color: var(--c-text-2);
+      margin-bottom: 16px;
+    }
+    .bank-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .bank-tab {
+      padding: 10px;
+      border: 1px solid var(--c-border);
+      background: #f9fafb;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--c-text-2);
+    }
+    .bank-tab.active {
+      background: var(--c-green-light);
+      border-color: var(--c-green);
+      color: var(--c-green-dark);
+    }
+    .verify-field {
+      margin-bottom: 14px;
+    }
+    .verify-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--c-text-2);
+      margin-bottom: 6px;
+    }
+    .verify-field input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--c-border);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .verify-field input:focus {
+      border-color: var(--c-green);
+    }
+    .verify-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--c-green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .verify-btn:disabled {
+      background: var(--c-text-3);
+    }
+
+    .success-card {
+      background: var(--c-green-light);
+      border: 1px solid var(--c-green-mid);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .sc-icon { font-size: 32px; margin-bottom: 6px; }
+    .sc-title { font-weight: 700; color: var(--c-green-dark); }
+    .sc-sub { font-size: 13px; color: var(--c-text-2); margin-top: 4px;}
+
+    .action-button {
+      width: 100%;
+      background: var(--c-green);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s infinite linear;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
 
-  <div id="view-payment" class="view active">
-    <div style="background:#fff; border:1px solid var(--c-border); border-radius:12px; padding:16px; margin-bottom:16px;">
-      <h3 id="tk-game">Game Session</h3>
-      <p id="tk-booking-type" style="font-size:14px; color:var(--c-text-2);"></p>
-      <p id="tk-amount" style="font-size:18px; font-weight:700; color:var(--c-green); margin-top:8px;">— ETB</p>
-    </div>
+  <!-- Fill-In Details Prompt -->
+  <p style="font-size: 12px; color: var(--c-text-2); margin-bottom: 12px;">Fill in your details to reserve spots</p>
 
-    <div class="verify-box" id="verify-form-section">
-      <div class="vb-title">Verify Your Transfer</div>
-      <div class="vb-sub">Amount to transfer: <span id="vb-amount" style="font-weight:700; color:var(--c-green);">—</span> ETB</div>
-      
-      <div class="verify-err" id="verify-err"></div>
-
-      <div class="bank-tabs">
-        <button class="bank-tab active" id="btab-cbe" onclick="selectBank('cbe')">CBE</button>
-        <button class="bank-tab" id="btab-tele" onclick="selectBank('telebirr')">Telebirr</button>
+  <!-- MATCH CARD -->
+  <div class="card match-header">
+    <div class="match-info">
+      <div class="icon-wrapper">⚽</div>
+      <div>
+        <div class="match-title" id="lbl-game-name">test</div>
+        <div class="match-meta" id="lbl-game-meta">Jun 11 · 12:00 PM · test</div>
       </div>
-
-      <input type="hidden" id="v-bank" value="cbe">
-
-      <div class="verify-field" id="vf-ref-row">
-        <label id="v-ref-label">Transaction Reference / TXID</label>
-        <input type="text" id="v-ref" placeholder="e.g. FT231..." autocomplete="off">
-      </div>
-
-      <div class="verify-field" id="vf-suffix-row" style="display:none;">
-        <label>Last 4 Digits of Phone Number</label>
-        <input type="number" id="v-suffix" placeholder="e.g. 4321" max="9999">
-      </div>
-
-      <button class="verify-btn" id="verify-submit-btn" onclick="verifyPayment()">Submit Verification</button>
     </div>
-
-    <div class="success-card" id="verify-success-section" style="display:none;">
-      <div class="sc-icon">🎉</div>
-      <div class="sc-title">Verification Submitted!</div>
-      <div class="sc-sub">We are checking your reference code. Your spot status will update soon under My Spots.</div>
-    </div>
-
-    <div class="tg-box" style="background:#fff; border:1px solid var(--c-border); border-radius:12px; padding:16px;">
-      <p style="font-size:13px; color:var(--c-text-2);">Alternative manual support:</p>
-      <a id="tg-link" href="#" target="_blank" style="color:var(--c-green); font-weight:600; text-decoration:none;">Open Telegram Chat</a>
-      <div id="tg-note" style="font-size:12px; color:var(--c-text-3);"></div>
-      <div id="steps-code" style="display:none;"></div>
-      <div id="pi-bank-name" style="display:none;"></div>
-      <div id="pi-acc-name" style="display:none;"></div>
-      <div id="pi-acc-num" style="display:none;"></div>
-      <div id="pi-telebirr" style="display:none;"></div>
-      <div id="pi-amount" style="display:none;"></div>
-      <div id="pi-ref" style="display:none;"></div>
+    <div class="price-tag">
+      <div class="price-num" id="lbl-game-rate">100</div>
+      <div class="price-lbl">ETB/player</div>
     </div>
   </div>
 
+  <!-- BOOKING TAB SWITCHER -->
+  <div class="booking-tabs">
+    <button class="b-tab active" id="tab-single" onclick="setBookingType('single')">✒️ Single Game</button>
+    <button class="b-tab" id="tab-monthly" onclick="setBookingType('monthly')">📅 Monthly – 4 Weeks</button>
+  </div>
+
+  <div class="section-title">Registration Details</div>
+
+  <!-- LIVE DYNAMIC RUNTIME ERROR CONTAINER -->
+  <div class="err-banner" id="runtime-error-box"></div>
+
+  <!-- SELECTION FORM FIELDS -->
+  <div id="registration-form-section">
+    <div class="input-label">Number of Players</div>
+    <select class="select-box" id="player-count-select" onchange="updateSummaryCalculations()">
+      <option value="1">1 player</option>
+      <option value="2">2 players</option>
+      <option value="3">3 players</option>
+      <option value="4">4 players</option>
+      <option value="5">5 players</option>
+    </select>
+
+    <!-- CALCULATION SUMMARY BOARD -->
+    <div class="summary-box">
+      <div class="summary-row">
+        <span>Players</span>
+        <span id="sum-count">1 player</span>
+      </div>
+      <div class="summary-row">
+        <span>Price per player</span>
+        <span id="sum-unit-price">100 ETB</span>
+      </div>
+      <div class="total-row">
+        <span>Total to pay</span>
+        <span id="sum-total-price">100 ETB</span>
+      </div>
+    </div>
+
+    <!-- MAIN ACTION CTA BUTTON -->
+    <button class="action-button" id="main-submit-btn" onclick="submitReg()">Reserve and Pay</button>
+  </div>
+
+  <!-- ── VERIFICATION FORM CARD ────────────────────────────────────────── -->
+  <div class="verify-box" id="verify-form-section">
+    <div class="vb-title">Verify Your Transfer</div>
+    <div class="vb-sub">Amount to transfer: <span id="vb-amount" style="font-weight:700; color:var(--c-green);">100</span> ETB</div>
+    
+    <div class="err-banner" id="verify-err" style="padding: 8px; margin-bottom: 10px;"></div>
+
+    <div class="bank-tabs">
+      <button class="bank-tab active" id="btab-cbe" onclick="selectBank('cbe')">CBE</button>
+      <button class="bank-tab" id="btab-tele" onclick="selectBank('telebirr')">Telebirr</button>
+    </div>
+
+    <input type="hidden" id="v-bank" value="cbe">
+
+    <div class="verify-field" id="vf-ref-row">
+      <label id="v-ref-label">Transaction Reference / TXID</label>
+      <input type="text" id="v-ref" placeholder="e.g. FT231..." autocomplete="off">
+    </div>
+
+    <div class="verify-field" id="vf-suffix-row" style="display:none;">
+      <label>Last 4 Digits of Phone Number</label>
+      <input type="number" id="v-suffix" placeholder="e.g. 4321">
+    </div>
+
+    <button class="verify-btn" id="verify-submit-btn" onclick="verifyPayment()">Submit Verification</button>
+  </div>
+
+  <!-- SUCCESS PRESENTATION WRAPPER -->
+  <div class="success-card" id="verify-success-section">
+    <div class="sc-icon">🎉</div>
+    <div class="sc-title">Verification Submitted!</div>
+    <div class="sc-sub">We are checking your reference code. Your spot status will update soon under My Spots.</div>
+  </div>
+
+
+  <!-- ── CONTROLLER SCRIPT LOGIC ──────────────────────────────────────── -->
   <script>
-  var API = 'https://addis-football-backend-production-bdb0.up.railway.app'; // Modify to your current active host base url
-  var token = null;
-  var currentGame = { id: 1, name: "Weekend Match Test", date: "2026-06-12", time: "16:00", location: "Addis Stadium" };
-  var activeVerifyBank = 'cbe';
-  var currentRegId = null;
-
-  /* Global helper abstractions */
-  function val(id) { return (document.getElementById(id)?.value || '').trim(); }
-  function toast(msg) { console.log("Toast notification: " + msg); }
-  function showView(viewName) { console.log("Navigating to view: " + viewName); }
-  function navHighlight(item) { }
-  function fmtDate(d) { return d; }
-  function fmtTime(t) { return t; }
-  async function loadGames() { }
-
-  async function apiFetch(url, method, body, auth) {
-    if (auth === undefined) auth = true;
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
-    if (auth && token) opts.headers['Authorization'] = 'Bearer ' + token;
-    if (body) opts.body = JSON.stringify(body);
+    // System Target Environment variables 
+    var API = 'https://addis-football-backend-production-bdb0.up.railway.app';
+    var token = null; 
     
-    var res = await fetch(url, opts);
-    if (!res.ok) { var errorData = await res.json().catch(() => ({})); throw new Error(errorData.message || 'Server error'); }
-    return res.json();
-  }
+    // Static baseline mockup state matching your structural view
+    var currentGame = { id: 12, name: "test", unitPrice: 100, dateMeta: "Jun 11 · 12:00 PM · test" };
+    var selectedBookingType = 'single';
+    var currentRegId = null;
 
-  /* Core workflow function executed on checkout form submission */
-  async function submitReg() {
-    var count = 1; 
-    var bookingType = 'single';
-    
-    try {
-      var r   = await apiFetch(API + '/api/registrations', 'POST', { gameId: currentGame.id, playerCount: count, bookingType: bookingType });
-      var reg = r.registration;
-      var pi  = r.paymentInfo;
-      currentRegId = reg.id; 
+    // Helper utilities
+    function val(id) { return (document.getElementById(id)?.value || '').trim(); }
 
-      // Render out interface card details
-      document.getElementById('tk-game').textContent         = currentGame.name;
-      document.getElementById('tk-booking-type').textContent = bookingType === 'monthly' ? '📅 Monthly – 4 Weeks' : '🎟 Single Game';
-      document.getElementById('tk-amount').textContent       = reg.totalAmount + ' ETB';
+    function setBookingType(type) {
+      selectedBookingType = type;
+      document.getElementById('tab-single').classList.toggle('active', type === 'single');
+      document.getElementById('tab-monthly').classList.toggle('active', type === 'monthly');
+      updateSummaryCalculations();
+    }
+
+    function updateSummaryCalculations() {
+      var count = parseInt(document.getElementById('player-count-select').value) || 1;
+      var rate = currentGame.unitPrice;
       
-      // Update our payment authentication form dynamic elements text lines safely
-      document.getElementById('vb-amount').textContent       = reg.totalAmount;
-      document.getElementById('verify-form-section').style.display    = 'block';
-      document.getElementById('verify-success-section').style.display = 'none';
-      document.getElementById('v-ref').value    = '';
-      document.getElementById('v-suffix').value = '';
-      selectBank('cbe');
+      if (selectedBookingType === 'monthly') {
+        rate = rate * 4; // 4 weeks allocation multiplier rule
+      }
 
-      // Populate dummy mapping objects hidden fields safely
-      document.getElementById('pi-bank-name').textContent = pi.bankName;
-      document.getElementById('pi-acc-name').textContent  = pi.accountName;
-      document.getElementById('pi-acc-num').textContent   = pi.accountNumber;
-      document.getElementById('pi-telebirr').textContent  = pi.telebirr;
-      document.getElementById('pi-amount').textContent    = pi.amount + ' ETB';
-      document.getElementById('pi-ref').textContent       = reg.code;
+      var combinedTotal = rate * count;
 
-      var handle = pi.telegram || '@AddisFootballAdmin';
-      var tgUser = handle.replace('@', '');
-      var tgMsg  = 'Hi! My ticket code is ' + reg.code + '. Sending my payment screenshot now.';
-      document.getElementById('tg-link').href = 'https://t.me/' + tgUser + '?text=' + encodeURIComponent(tgMsg);
-      document.getElementById('tg-note').textContent = 'Admin Username: ' + handle;
-      document.getElementById('steps-code').textContent = reg.code;
-
-      await loadGames();
-      showView('payment');
-      navHighlight('games');
-      toast('✅ Spot reserved! ' + reg.code);
-    } catch (e) {
-      console.error(e);
-      toast('❌ Error processing registration: ' + e.message);
-    }
-  }
-
-  /* ─── PAYMENT VERIFICATION HANDLERS ─────────────────────────────────── */
-  function selectBank(bank) {
-    activeVerifyBank = bank;
-    document.getElementById('v-bank').value = bank;
-    
-    var isCBE = bank === 'cbe';
-    document.getElementById('btab-cbe').classList.toggle('active', isCBE);
-    document.getElementById('btab-tele').classList.toggle('active', !isCBE);
-    
-    if (isCBE) {
-      document.getElementById('v-ref-label').textContent = 'Transaction Reference / TXID';
-      document.getElementById('v-ref').placeholder = 'e.g. FT231...';
-      document.getElementById('vf-suffix-row').style.display = 'none';
-    } else {
-      document.getElementById('v-ref-label').textContent = 'Transaction Reference (Optional)';
-      document.getElementById('v-ref').placeholder = 'e.g. 10478...';
-      document.getElementById('vf-suffix-row').style.display = 'block';
-    }
-  }
-
-  async function verifyPayment() {
-    var errEl = document.getElementById('verify-err');
-    var btn = document.getElementById('verify-submit-btn');
-    errEl.classList.remove('show');
-    
-    var bank = document.getElementById('v-bank').value;
-    var refCode = val('v-ref');
-    var suffix = val('v-suffix');
-    
-    if (bank === 'cbe' && !refCode) {
-      errEl.textContent = '❌ Please enter your CBE transaction reference code.';
-      errEl.classList.add('show');
-      return;
-    }
-    if (bank === 'telebirr' && !refCode && !suffix) {
-      errEl.textContent = '❌ Please provide either the transaction reference or the last 4 digits of your phone.';
-      errEl.classList.add('show');
-      return;
+      document.getElementById('sum-count').textContent = count + (count === 1 ? ' player' : ' players');
+      document.getElementById('sum-unit-price').textContent = rate + ' ETB';
+      document.getElementById('sum-total-price').textContent = combinedTotal + ' ETB';
     }
 
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner"></div> Submitting...';
-    
-    try {
-      await apiFetch(API + '/api/registrations/' + currentRegId + '/verify', 'POST', {
-        bank: bank,
-        referenceCode: refCode,
-        phoneSuffix: suffix
-      });
+    /* Primary step: Posts user reservation parameters directly to backend */
+    async function submitReg() {
+      var errBox = document.getElementById('runtime-error-box');
+      var actionBtn = document.getElementById('main-submit-btn');
       
-      document.getElementById('verify-form-section').style.display = 'none';
-      document.getElementById('verify-success-section').style.display = 'block';
-      toast('✅ Payment details logged!');
-      if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-    } catch (e) {
-      errEl.textContent = '❌ ' + e.message;
-      errEl.classList.add('show');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Submit Verification';
+      errBox.style.display = 'none';
+      actionBtn.disabled = true;
+      actionBtn.innerHTML = '<div class="spinner"></div> Reserving...';
+
+      var count = parseInt(document.getElementById('player-count-select').value) || 1;
+
+      try {
+        // Backend HTTP request lifecycle context
+        var response = await fetch(API + '/api/registrations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameId: currentGame.id,
+            playerCount: count,
+            bookingType: selectedBookingType
+          })
+        });
+
+        if (!response.ok) {
+          var errData = await response.json().catch(() => ({}));
+          throw new Error(errData.message || 'Failed to initialize booking registration profile.');
+        }
+
+        var data = await response.json();
+        currentRegId = data.registration?.id || data.id; // Assign tracking registration reference code safely
+
+        // Swap out interfaces safely without null object method pointer crashes!
+        document.getElementById('registration-form-section').style.display = 'none';
+        
+        document.getElementById('vb-amount').textContent = data.registration?.totalAmount || (count * currentGame.unitPrice);
+        document.getElementById('verify-form-section').style.display = 'block';
+
+        if (window.Telegram?.WebApp) {
+          Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.style.display = 'block';
+      } finally {
+        actionBtn.disabled = false;
+        actionBtn.textContent = 'Reserve and Pay';
+      }
     }
-  }
+
+    /* Toggle internal form variables based on payment processor selected */
+    function selectBank(bank) {
+      document.getElementById('v-bank').value = bank;
+      var isCBE = (bank === 'cbe');
+      
+      document.getElementById('btab-cbe').classList.toggle('active', isCBE);
+      document.getElementById('btab-tele').classList.toggle('active', !isCBE);
+      
+      if (isCBE) {
+        document.getElementById('v-ref-label').textContent = 'Transaction Reference / TXID';
+        document.getElementById('v-ref').placeholder = 'e.g. FT231...';
+        document.getElementById('vf-suffix-row').style.display = 'none';
+      } else {
+        document.getElementById('v-ref-label').textContent = 'Transaction Reference (Optional)';
+        document.getElementById('v-ref').placeholder = 'e.g. 10478...';
+        document.getElementById('vf-suffix-row').style.display = 'block';
+      }
+    }
+
+    /* Final Step: Verifies payment data natively */
+    async function verifyPayment() {
+      var errEl = document.getElementById('verify-err');
+      var btn = document.getElementById('verify-submit-btn');
+      errEl.style.display = 'none';
+      
+      var bank = document.getElementById('v-bank').value;
+      var refCode = val('v-ref');
+      var suffix = val('v-suffix');
+      
+      if (bank === 'cbe' && !refCode) {
+        errEl.textContent = '❌ Please enter your CBE transaction reference code.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (bank === 'telebirr' && !refCode && !suffix) {
+        errEl.textContent = '❌ Please provide either your reference code or the last 4 digits of your phone.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div> Submitting...';
+      
+      try {
+        var response = await fetch(API + '/api/registrations/' + currentRegId + '/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bank: bank,
+            referenceCode: refCode,
+            phoneSuffix: suffix
+          })
+        });
+
+        if (!response.ok) throw new Error('Verification rejection error response from live server instance.');
+
+        document.getElementById('verify-form-section').style.display = 'none';
+        document.getElementById('verify-success-section').style.display = 'block';
+      } catch (e) {
+        errEl.textContent = '❌ ' + e.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Verification';
+      }
+    }
+
+    // Run initialization logic on DOM readiness window checks
+    document.addEventListener("DOMContentLoaded", function() {
+      updateSummaryCalculations();
+      if (window.Telegram?.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+      }
+    });
   </script>
 </body>
 </html>

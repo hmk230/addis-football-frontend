@@ -406,7 +406,7 @@ body{overflow-x:hidden;padding-bottom:160px}
 <body>
 
 <script>
-  var API = 'https://addis-football-backend-production-bdb0.up.railway.app';
+  var API = 'https://addis-football-backend-production.up.railway.app';
 </script>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -571,7 +571,7 @@ body{overflow-x:hidden;padding-bottom:160px}
     </div>
 
     <div class="alert alert-ok" style="margin:0 16px 14px">
-      🎉 Your spot is reserved! Complete payment within 30 minute to confirm.
+      🎉 Your spot is reserved! Complete payment within 30 minutes to confirm.
     </div>
 
     <div class="ticket-card">
@@ -898,14 +898,18 @@ function switchBookingType(type) {
   document.getElementById('bt-single').classList.toggle('active', !isMonthly);
   document.getElementById('bt-monthly').classList.toggle('active', isMonthly);
 
-  // Update chip price display
-  var displayPrice = isMonthly
-    ? Math.round((currentGame.pricePerPlayer * 4) - (currentGame.pricePerPlayer * 0.5))
-    : currentGame.pricePerPlayer;
-  document.querySelector('#form-game-chip .chip-price .price').textContent = displayPrice;
-  document.querySelector('#form-game-chip .chip-price .per').textContent   = 'ETB/' + (isMonthly ? 'mo' : 'player');
+  if (currentGame) {
+    var displayPrice = isMonthly
+      ? Math.round((currentGame.pricePerPlayer * 4) - (currentGame.pricePerPlayer * 0.5))
+      : currentGame.pricePerPlayer;
+    var priceEl = document.querySelector('#form-game-chip .chip-price .price');
+    var perEl   = document.querySelector('#form-game-chip .chip-price .per');
+    if (priceEl) priceEl.textContent = displayPrice;
+    if (perEl)   perEl.textContent   = 'ETB/' + (isMonthly ? 'mo' : 'player');
+  }
 
-  document.getElementById('form-sub').textContent = isMonthly
+  var subEl = document.getElementById('form-sub');
+  if (subEl) subEl.textContent = isMonthly
     ? '📅 Monthly booking — 4 weeks at a discounted rate'
     : 'Fill in your details to reserve spots';
 

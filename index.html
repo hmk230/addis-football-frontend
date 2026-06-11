@@ -516,10 +516,7 @@ body{overflow-x:hidden;padding-bottom:160px}
   <div id="view-games" class="view show">
     <div class="page-pad">
       <div class="page-title">Upcoming Games</div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div class="page-sub">Select a game to register your team</div>
-        <button onclick="shuffleGames()" style="background:none;border:1px solid var(--c-border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--c-text-2);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px">🔀 Shuffle</button>
-      </div>
+      <div class="page-sub">Select a game to register your team</div>
     </div>
     <div style="padding:0 16px 16px" id="games-list">
       <div class="empty"><div class="icon">⏳</div><p>Loading games…</p></div>
@@ -792,20 +789,11 @@ async function loadGames() {
   }
 }
 
-function shuffleGames() {
-  for (var i = gamesData.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = gamesData[i]; gamesData[i] = gamesData[j]; gamesData[j] = tmp;
-  }
-  renderGames();
-  toast('🔀 Games shuffled');
-}
-
 function renderGames() {
   var c = document.getElementById('games-list');
   if (!gamesData.length) { c.innerHTML = '<div class="empty"><div class="icon">📅</div><p>No games scheduled yet.<br>Check back soon!</p></div>'; return; }
   c.innerHTML = '';
-  var sorted = [...gamesData];
+  var sorted = [...gamesData].sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
   sorted.forEach(function(g) {
     var pct      = Math.min(100, (g.approvedSpots / g.maxSpots) * 100);
     var spotsLeft= g.spotsLeft;
@@ -935,11 +923,13 @@ function recalc() {
   document.getElementById('tc-total').textContent       = total + ' ETB';
 
   var discRow = document.getElementById('tc-discount-row');
-  if (isMonthly) {
-    discRow.style.display = 'flex';
-    document.getElementById('tc-discount').textContent = '−' + discount + ' ETB';
-  } else {
-    discRow.style.display = 'none';
+  if (discRow) {
+    if (isMonthly) {
+      discRow.style.display = 'flex';
+      document.getElementById('tc-discount').textContent = '−' + discount + ' ETB';
+    } else {
+      discRow.style.display = 'none';
+    }
   }
 }
 

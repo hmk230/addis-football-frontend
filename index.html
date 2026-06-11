@@ -200,7 +200,44 @@ body{overflow-x:hidden;padding-bottom:160px}
 .game-chip .chip-price .price{font-size:16px;font-weight:700;color:var(--c-green)}
 .game-chip .chip-price .per{font-size:11px;color:var(--c-text-3)}
 
-/* ── PAYMENT INFO ───────────────────────────────────────────────────── */
+/* ── VERIFICATION FORM ───────────────────────────────────────────────── */
+.verify-box{
+  background:var(--c-surface);border:1px solid var(--c-border);
+  border-radius:var(--radius);padding:20px 16px;margin:0 16px 12px;
+}
+.verify-box .vb-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.verify-box .vb-sub{font-size:13px;color:var(--c-text-2);margin-bottom:16px;line-height:1.5}
+.bank-tabs{display:flex;gap:4px;background:#f3f4f6;border-radius:10px;padding:3px;margin-bottom:14px}
+.bank-tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:600;color:var(--c-text-3);cursor:pointer;border-radius:8px;border:none;background:none;font-family:'Inter',sans-serif;transition:all .15s}
+.bank-tab.active{background:var(--c-surface);color:var(--c-text);box-shadow:var(--shadow)}
+.verify-field{margin-bottom:12px}
+.verify-field label{display:block;font-size:12px;font-weight:600;color:var(--c-text-2);margin-bottom:5px}
+.verify-field input{display:block;width:100%;padding:11px 14px;background:var(--c-bg);border:1.5px solid var(--c-border);border-radius:var(--radius-sm);font-size:15px;font-family:'Inter',sans-serif;color:var(--c-text);outline:none;transition:border-color .15s}
+.verify-field input:focus{border-color:var(--c-border-focus)}
+.verify-field input::placeholder{color:var(--c-text-3)}
+.verify-btn{
+  display:block;width:100%;padding:13px;background:var(--c-green);color:#fff;
+  font-size:15px;font-weight:600;border-radius:var(--radius);border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:background .15s;margin-top:4px;
+}
+.verify-btn:hover{background:var(--c-green-dark)}
+.verify-btn:disabled{background:var(--c-border);color:var(--c-text-3);cursor:not-allowed}
+.verify-err{font-size:13px;color:var(--c-red);background:var(--c-red-light);border:1px solid #fecaca;border-radius:8px;padding:10px 12px;margin-bottom:12px;display:none}
+.verify-err.show{display:block}
+
+/* ── SUCCESS CARD ────────────────────────────────────────────────────── */
+.success-card{
+  background:var(--c-surface);border:2px solid var(--c-green);
+  border-radius:var(--radius);padding:24px 16px;margin:0 16px 12px;text-align:center;
+}
+.success-card .sc-icon{font-size:48px;margin-bottom:12px}
+.success-card .sc-title{font-size:20px;font-weight:700;color:var(--c-green);margin-bottom:4px}
+.success-card .sc-sub{font-size:13px;color:var(--c-text-2);margin-bottom:20px}
+.success-card .sc-detail{background:var(--c-green-light);border:1px solid var(--c-green-mid);border-radius:var(--radius-sm);padding:14px;text-align:left}
+.sc-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--c-green-mid)}
+.sc-row:last-child{border-bottom:none}
+.sc-row .sk{color:var(--c-text-2)}
+.sc-row .sv{font-weight:600;text-align:right}
 .ticket-card{
   background:var(--c-surface);border:1px solid var(--c-border);
   border-radius:var(--radius);overflow:hidden;margin:0 16px 12px;
@@ -479,7 +516,10 @@ body{overflow-x:hidden;padding-bottom:160px}
   <div id="view-games" class="view show">
     <div class="page-pad">
       <div class="page-title">Upcoming Games</div>
-      <div class="page-sub">Select a game to register your team</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="page-sub">Select a game to register your team</div>
+        <button onclick="shuffleGames()" style="background:none;border:1px solid var(--c-border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--c-text-2);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px">🔀 Shuffle</button>
+      </div>
     </div>
     <div style="padding:0 16px 16px" id="games-list">
       <div class="empty"><div class="icon">⏳</div><p>Loading games…</p></div>
@@ -518,9 +558,9 @@ body{overflow-x:hidden;padding-bottom:160px}
       <div class="total-row discount" id="tc-discount-row" style="display:none"><span>Discount (−50% of 1 game)</span><span id="tc-discount">—</span></div>
       <div class="total-row"><span>Total to pay</span><span id="tc-total">—</span></div>
     </div>
-<div style="padding-bottom: 100px;">
+
     <button class="btn-primary" id="form-submit-btn" onclick="submitReg()" style="margin-top:12px">Reserve Spots</button>
-    <div class="spacer"></div></div>
+    <div class="spacer"></div>
   </div>
 
   <!-- ── VIEW: PAYMENT INFO ──────────────────────────────── -->
@@ -581,9 +621,9 @@ body{overflow-x:hidden;padding-bottom:160px}
       <div class="step-item"><div class="step-num">4</div><div class="step-txt">Include your <strong>ticket code</strong> (<span id="steps-code" style="font-family:monospace;color:var(--c-green)">—</span>) in the message.</div></div>
       <div class="step-item"><div class="step-num">5</div><div class="step-txt">We'll <strong>confirm your spot</strong> within a few hours. You'll see it in My Spots. ✅</div></div>
     </div>
-<div style="padding-bottom: 100px;">
+
     <button class="btn-secondary" onclick="showView('games')">← Back to Games</button>
-    <div class="spacer"></div></div>
+    <div class="spacer"></div>
   </div>
 
   <!-- ── VIEW: MY SPOTS ──────────────────────────────────── -->
@@ -752,11 +792,20 @@ async function loadGames() {
   }
 }
 
+function shuffleGames() {
+  for (var i = gamesData.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = gamesData[i]; gamesData[i] = gamesData[j]; gamesData[j] = tmp;
+  }
+  renderGames();
+  toast('🔀 Games shuffled');
+}
+
 function renderGames() {
   var c = document.getElementById('games-list');
   if (!gamesData.length) { c.innerHTML = '<div class="empty"><div class="icon">📅</div><p>No games scheduled yet.<br>Check back soon!</p></div>'; return; }
   c.innerHTML = '';
-  var sorted = [...gamesData].reverse();
+  var sorted = [...gamesData];
   sorted.forEach(function(g) {
     var pct      = Math.min(100, (g.approvedSpots / g.maxSpots) * 100);
     var spotsLeft= g.spotsLeft;
@@ -902,7 +951,16 @@ async function submitReg() {
     var r   = await apiFetch(API + '/api/registrations', 'POST', { gameId: currentGame.id, playerCount: count, bookingType: bookingType });
     var reg = r.registration;
     var pi  = r.paymentInfo;
-    paymentInfo = pi;
+    currentRegId = reg.id;
+
+    // Reset verify form
+    document.getElementById('verify-form-section').style.display    = 'block';
+    document.getElementById('verify-success-section').style.display = 'none';
+    document.getElementById('back-to-games-btn').style.display      = 'block';
+    document.getElementById('verify-err').classList.remove('show');
+    document.getElementById('v-ref').value    = '';
+    document.getElementById('v-suffix').value = '';
+    selectBank('cbe');
 
     // Ticket
     document.getElementById('tk-game').textContent         = currentGame.name;
@@ -912,8 +970,7 @@ async function submitReg() {
     document.getElementById('tk-players').textContent      = count + ' player' + (count > 1 ? 's' : '');
     document.getElementById('tk-booking-type').textContent = bookingType === 'monthly' ? '📅 Monthly – 4 Weeks' : '🎟 Single Game';
     document.getElementById('tk-amount').textContent       = reg.totalAmount + ' ETB';
-    document.getElementById('tk-code').textContent         = reg.code;
-    document.getElementById('steps-code').textContent      = reg.code;
+    document.getElementById('vb-amount').textContent       = reg.totalAmount;
 
     // Payment info
     document.getElementById('pi-bank-name').textContent = pi.bankName;
@@ -921,15 +978,6 @@ async function submitReg() {
     document.getElementById('pi-acc-num').textContent   = pi.accountNumber;
     document.getElementById('pi-telebirr').textContent  = pi.telebirr;
     document.getElementById('pi-amount').textContent    = pi.amount + ' ETB';
-    document.getElementById('pi-ref').textContent       = pi.reference;
-
-    // Telegram
-    var handle = pi.telegram || '@AddisFootballAdmin';
-    var tgUser = handle.replace('@', '');
-    var tgMsg  = 'Hi! I registered for ' + currentGame.name + (bookingType === 'monthly' ? ' (Monthly)' : '') + '. My ticket code is ' + reg.code + '. Sending my payment screenshot now.';
-    document.getElementById('tg-link').href        = 'https://t.me/' + tgUser + '?text=' + encodeURIComponent(tgMsg);
-    document.getElementById('tg-link').textContent = 'Message ' + handle;
-    document.getElementById('tg-note').textContent = 'Send screenshot to ' + handle + ' with code: ' + reg.code;
 
     await loadGames();
     showView('payment');

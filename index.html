@@ -915,10 +915,12 @@ function switchBookingType(type) {
 }
 
 function recalc() {
-  var count = Number(document.getElementById('f-count').value);
-  var box   = document.getElementById('total-box');
-  if (!box) return;
-  if (!count || !currentGame) { box.style.display = 'none'; return; }
+  if (!currentGame) return;
+  var countEl = document.getElementById('f-count');
+  var box     = document.getElementById('total-box');
+  if (!countEl || !box) return;
+  var count = Number(countEl.value);
+  if (!count) { box.style.display = 'none'; return; }
 
   var isMonthly   = bookingType === 'monthly';
   var basePrice   = currentGame.pricePerPlayer;

@@ -601,7 +601,39 @@ body{overflow-x:hidden;padding-bottom:160px}
         <div class="ticket-row"><span class="tr-label">Reference / Note</span><span class="tr-value code" id="pi-ref">—</span></div>
       </div>
     </div>
+<!-- ── VERIFICATION FORM ─────────────────────────────────────────────── -->
+    <div class="verify-box" id="verify-form-section">
+      <div class="vb-title">Verify Your Transfer</div>
+      <div class="vb-sub">Amount to transfer: <span id="vb-amount" style="font-weight:700; color:var(--c-green);">—</span> ETB</div>
+      
+      <div class="verify-err" id="verify-err"></div>
 
+      <div class="bank-tabs">
+        <button class="bank-tab active" id="btab-cbe" onclick="selectBank('cbe')">CBE</button>
+        <button class="bank-tab" id="btab-tele" onclick="selectBank('telebirr')">Telebirr</button>
+      </div>
+
+      <input type="hidden" id="v-bank" value="cbe">
+
+      <div class="verify-field" id="vf-ref-row">
+        <label id="v-ref-label">Transaction Reference / TXID</label>
+        <input type="text" id="v-ref" placeholder="e.g. FT231..." autocomplete="off">
+      </div>
+
+      <div class="verify-field" id="vf-suffix-row" style="display:none;">
+        <label>Last 4 Digits of Phone Number</label>
+        <input type="number" id="v-suffix" placeholder="e.g. 4321" max="9999">
+      </div>
+
+      <button class="verify-btn" id="verify-submit-btn" onclick="verifyPayment()">Submit Verification</button>
+    </div>
+
+    <!-- Success Message (Swapped upon verification submission) -->
+    <div class="success-card" id="verify-success-section" style="display:none;">
+      <div class="sc-icon">🎉</div>
+      <div class="sc-title">Verification Submitted!</div>
+      <div class="sc-sub">We are checking your reference code. Your spot status will update soon under My Spots.</div>
+    </div>
     <div class="tg-box">
       <div class="tg-icon">📩</div>
       <div class="tg-title">Send Screenshot on Telegram</div>
@@ -1003,7 +1035,71 @@ async function submitReg() {
     btn.disabled = false; btn.textContent = 'Reserve Spots';
   }
 }
+/* ─── PAYMENT VERIFICATION HANDLERS ─────────────────────────────────── */
+var activeVerifyBank = 'cbe';
+var currentRegId = null; 
 
+function selectBank(bank) {
+  activeVerifyBank = bank;
+  document.getElementById('v-bank').value = bank;
+  
+  var isCBE = bank === 'cbe';
+  document.getElementById('btab-cbe').classList.toggle('active', isCBE);
+  document.getElementById('btab-tele').classList.toggle('active', !isCBE);
+  
+  if (isCBE) {
+    document.getElementById('v-ref-label').textContent = 'Transaction Reference / TXID';
+    document.getElementById('v-ref').placeholder = 'e.g. FT231...';
+    document.getElementById('vf-suffix-row').style.display = 'none';
+  } else {
+    document.getElementById('v-ref-label').textContent = 'Transaction Reference (Optional)';
+    document.getElementById('v-ref').placeholder = 'e.g. 10478...';
+    document.getElementById('vf-suffix-row').style.display = 'block';
+  }
+}
+
+async function verifyPayment() {
+  var errEl = document.getElementById('verify-err');
+  var btn = document.getElementById('verify-submit-btn');
+  errEl.classList.remove('show');
+  
+  var bank = document.getElementById('v-bank').value;
+  var refCode = val('v-ref');
+  var suffix = val('v-suffix');
+  
+  if (bank === 'cbe' && !refCode) {
+    errEl.textContent = '❌ Please enter your CBE transaction reference code.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (bank === 'telebirr' && !refCode && !suffix) {
+    errEl.textContent = '❌ Please provide either the transaction reference or the last 4 digits of your phone.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Submitting...';
+  
+  try {
+    await apiFetch(API + '/api/registrations/' + currentRegId + '/verify', 'POST', {
+      bank: bank,
+      referenceCode: refCode,
+      phoneSuffix: suffix
+    });
+    
+    document.getElementById('verify-form-section').style.display = 'none';
+    document.getElementById('verify-success-section').style.display = 'block';
+    toast('✅ Payment details logged!');
+    if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+  } catch (e) {
+    errEl.textContent = '❌ ' + e.message;
+    errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit Verification';
+  }
+}
 /* ─── MY SPOTS ──────────────────────────────────────────────────────── */
 async function loadMySpots() {
   var c = document.getElementById('spots-list');

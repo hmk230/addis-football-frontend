@@ -1090,7 +1090,7 @@ async function verifyPayment() {
     
     document.getElementById('verify-form-section').style.display = 'none';
     document.getElementById('verify-success-section').style.display = 'block';
-    toast('✅ Payment details logged!');
+    toast('Payment details logged!');
     if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
   } catch (e) {
     errEl.textContent = '❌ ' + e.message;

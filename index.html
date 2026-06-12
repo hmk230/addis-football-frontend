@@ -414,10 +414,6 @@ body{overflow-x:hidden;padding-bottom:160px}
           <label id="ref-label">Reference Number</label>
           <input type="text" id="v-ref" placeholder="e.g. FT1234567890"/>
         </div>
-        <div class="verify-field" id="suffix-field">
-          <label>Account Suffix <span style="font-size:11px;color:var(--c-text-3)">(last 8 digits of your CBE account)</span></label>
-          <input type="text" id="v-suffix" placeholder="12345678" maxlength="8"/>
-        </div>
         <button class="verify-btn" id="verify-btn" onclick="submitVerify()">✅ Verify Payment</button>
       </div>
 
@@ -798,24 +794,19 @@ function selectBank(bank) {
   selectedBank = bank;
   document.getElementById('btab-cbe').classList.toggle('active',      bank === 'cbe');
   document.getElementById('btab-telebirr').classList.toggle('active', bank === 'telebirr');
-  document.getElementById('suffix-field').style.display = bank === 'cbe' ? 'block' : 'none';
-  document.getElementById('ref-label').textContent      = bank === 'telebirr' ? 'Transaction Number' : 'Reference Number';
-  document.getElementById('v-ref').placeholder          = bank === 'telebirr' ? 'e.g. DET8FJGUJ4' : 'e.g. FT1234567890';
+  document.getElementById('ref-label').textContent = bank === 'telebirr' ? 'Transaction Number' : 'Reference Number';
+  document.getElementById('v-ref').placeholder     = bank === 'telebirr' ? 'e.g. DET8FJGUJ4' : 'e.g. FT1234567890';
 }
 
 async function submitVerify() {
   var errEl  = document.getElementById('verify-err');
   var btn    = document.getElementById('verify-btn');
   var ref    = document.getElementById('v-ref').value.trim();
-  var suffix = document.getElementById('v-suffix').value.trim();
   errEl.classList.remove('show');
   if (!ref) { errEl.textContent = 'Please enter your reference number.'; errEl.classList.add('show'); return; }
-  if (selectedBank === 'cbe' && suffix.length !== 8) { errEl.textContent = 'CBE account suffix must be exactly 8 digits.'; errEl.classList.add('show'); return; }
   btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Verifying…';
   try {
-    var body = { bank: selectedBank, referenceNumber: ref };
-    if (selectedBank === 'cbe') body.accountSuffix = suffix;
-    var r = await apiFetch(API + '/api/verify-payment/' + currentRegId, 'POST', body);
+    var r = await apiFetch(API + '/api/verify-payment/' + currentRegId, 'POST', { bank: selectedBank, referenceNumber: ref });
     document.getElementById('verify-form-section').style.display    = 'none';
     document.getElementById('verify-success-section').style.display = 'block';
     document.getElementById('back-to-games-btn').style.display      = 'none';

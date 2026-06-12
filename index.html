@@ -811,36 +811,81 @@ async function submitVerify() {
   errEl.classList.remove('show');
   if (!ref) { errEl.textContent = 'Please enter your reference number.'; errEl.classList.add('show'); return; }
   if (selectedBank === 'cbe' && suffix.length !== 8) { errEl.textContent = 'CBE account suffix must be exactly 8 digits.'; errEl.classList.add('show'); return; }
-  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Verifying…';
-  try {
-    var body = { bank: selectedBank, referenceNumber: ref };
-    if (selectedBank === 'cbe') body.accountSuffix = suffix;
-    var r = await apiFetch(API + '/api/verify-payment/' + currentRegId, 'POST', body);
-    document.getElementById('verify-form-section').style.display    = 'none';
-    document.getElementById('verify-success-section').style.display = 'block';
-    document.getElementById('back-to-games-btn').style.display      = 'none';
-    document.getElementById('sc-sender').textContent   = r.senderName         || '—';
-    document.getElementById('sc-amount').textContent   = (r.verifiedAmount || '—') + ' ETB';
-    document.getElementById('sc-game').textContent     = r.game?.name         || '—';
-    document.getElementById('sc-location').textContent = r.game?.location      || '—';
-    document.getElementById('sc-date').textContent     = fmtDate(r.game?.date) + ' · ' + fmtDay(r.game?.date);
-    document.getElementById('sc-time').textContent     = fmtTime(r.game?.time);
-    await loadGames();
-    toast('🎉 Payment verified! Spot confirmed.');
-    if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-  } catch(e) {
-    errEl.textContent = e.message;
-    errEl.classList.add('show');
-    // If reservation was cancelled on backend, redirect back to games after 3s
-    if (e.cancelled) {
-      setTimeout(function() {
-        currentRegId = null;
-        showView('games');
-        loadGames();
-      }, 3000);
+  
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Verifying…';
+
+  var body = { bank: selectedBank, referenceNumber: ref };
+  if (selectedBank === 'cbe') body.accountSuffix = suffix;
+
+  // Poll up to 10 times (30 seconds total) for CBE async verification
+  var maxAttempts = 10;
+  var attempt = 0;
+
+  async function tryVerify() {
+    attempt++;
+    try {
+      // Use raw fetch so we can check status before throwing
+      var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
+      if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+      opts.body = JSON.stringify(body);
+
+      var res  = await fetch(API + '/api/verify-payment/' + currentRegId, opts);
+      var data = await res.json();
+
+      // Still processing — retry after 3 seconds
+      if (res.status === 202 && data.pending) {
+        if (attempt >= maxAttempts) {
+          btn.disabled = false;
+          btn.textContent = '✅ Verify Payment';
+          errEl.textContent = 'Verification is taking longer than expected. Please try again in a moment.';
+          errEl.classList.add('show');
+          return;
+        }
+        var secs = (maxAttempts - attempt) * 3;
+        btn.innerHTML = '<div class="spinner"></div> Processing… (' + secs + 's)';
+        setTimeout(tryVerify, 3000);
+        return;
+      }
+
+      // Error response
+      if (!res.ok) {
+        var err = new Error(data.error || 'Request failed');
+        if (data.cancelled) err.cancelled = true;
+        throw err;
+      }
+
+      // ✅ Success
+      var r = data;
+      document.getElementById('verify-form-section').style.display    = 'none';
+      document.getElementById('verify-success-section').style.display = 'block';
+      document.getElementById('back-to-games-btn').style.display      = 'none';
+      document.getElementById('sc-sender').textContent   = r.senderName         || '—';
+      document.getElementById('sc-amount').textContent   = (r.verifiedAmount || '—') + ' ETB';
+      document.getElementById('sc-game').textContent     = r.game?.name         || '—';
+      document.getElementById('sc-location').textContent = r.game?.location     || '—';
+      document.getElementById('sc-date').textContent     = fmtDate(r.game?.date) + ' · ' + fmtDay(r.game?.date);
+      document.getElementById('sc-time').textContent     = fmtTime(r.game?.time);
+      await loadGames();
+      toast('🎉 Payment verified! Spot confirmed.');
+      if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = '✅ Verify Payment';
+      errEl.textContent = e.message;
+      errEl.classList.add('show');
+      if (e.cancelled) {
+        setTimeout(function() {
+          currentRegId = null;
+          showView('games');
+          loadGames();
+        }, 3000);
+      }
     }
   }
-  finally { btn.disabled = false; btn.textContent = '✅ Verify Payment'; }
+
+  tryVerify();
 }
 
 /* ── MY SPOTS ── */

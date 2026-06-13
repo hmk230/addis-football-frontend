@@ -627,18 +627,7 @@ async function loadMySpots(){
       var pillLabel={approved:'✓ Confirmed',pending:'⏳ Pending',rejected:'❌ Rejected'}[reg.status]||reg.status;
       var bookingBadge=isMonthly?'<span class="booking-badge monthly">📅 Monthly – 4 weeks</span>':'<span class="booking-badge single">Single</span>';
       var payToggle='';
-      if(isPending&&pi){
-        var handle=pi.telegram||'@AddisFootballAdmin',tgUser=handle.replace('@',''),tgMsg='Hi! My ticket code is '+reg.code+'. Sending my payment screenshot now.';
-        payToggle='<button class="pay-toggle-btn" onclick="togglePayDetails(this)">💳 View Payment Details ▾</button>'+
-          '<div class="pay-details">'+
-          '<div class="pay-detail-row"><span class="pdl">Bank</span><span class="pdv">'+esc(pi.bankName)+'</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">Account Name</span><span class="pdv">'+esc(pi.accountName)+'</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">Account No.</span><span class="pdv">'+esc(pi.accountNumber)+'</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">Telebirr</span><span class="pdv">'+esc(pi.telebirr)+'</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">Amount</span><span class="pdv" style="color:var(--c-green)">'+reg.totalAmount+' ETB</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">Reference</span><span class="pdv code">'+esc(reg.code)+'</span></div>'+
-          '<a class="pay-tg-btn" href="https://t.me/'+tgUser+'?text='+encodeURIComponent(tgMsg)+'" target="_blank">📩 Open Telegram</a></div>';
-      }
+      
       var inlineVerify='';
       if(isPending){
         var uid='iv-'+reg.id.replace(/-/g,'');
@@ -650,6 +639,14 @@ async function loadMySpots(){
           '<div class="inline-verify-field"><label id="'+uid+'-reflabel">Reference Number</label><input type="text" id="'+uid+'-ref" placeholder="e.g. FT1234567890"/></div>'+
           '<div class="inline-verify-field" id="'+uid+'-suffixfield"><label>Account Suffix <span style="font-size:10px;color:var(--c-text-3)">(last 8 digits)</span></label><input type="text" id="'+uid+'-suffix" placeholder="12345678" maxlength="8"/></div>'+
           '<button class="inline-verify-btn" id="'+uid+'-btn" onclick="submitInlineVerify(\''+reg.id+'\',\''+uid+'\')">✅ Verify</button></div>';
+		  '<div class="pay-details">'+
+          '<div class="pay-detail-row"><span class="pdl">Bank</span><span class="pdv">'+esc(pi.bankName)+'</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">Account Name</span><span class="pdv">'+esc(pi.accountName)+'</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">Account No.</span><span class="pdv">'+esc(pi.accountNumber)+'</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">Telebirr</span><span class="pdv">'+esc(pi.telebirr)+'</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">Amount</span><span class="pdv" style="color:var(--c-green)">'+reg.totalAmount+' ETB</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">Reference</span><span class="pdv code">'+esc(reg.code)+'</span></div>'+
+          '<a class="pay-tg-btn" href="https://t.me/'+tgUser+'?text='+encodeURIComponent(tgMsg)+'" target="_blank">📩 Open Telegram</a></div>';
       }
       var div=document.createElement('div');div.className='reg-card';div.id='regcard-'+reg.id;
       div.innerHTML='<div class="reg-card-top"><div><div class="reg-name">'+esc(g.name||'—')+'</div><div class="reg-game">'+fmtDate(g.date)+' · '+fmtTime(g.time)+'</div></div><span class="status-pill '+pillClass+'">'+pillLabel+'</span></div>'+

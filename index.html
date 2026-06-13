@@ -409,14 +409,14 @@ body{overflow-x:hidden;padding-bottom:160px}
           <div class="sc-row"><span class="sk">📍 Location</span><span class="sv" id="sc-location">—</span></div>
           <div class="sc-row"><span class="sk">📅 Date</span><span class="sv" id="sc-date">—</span></div>
           <div class="sc-row"><span class="sk">⏰ Time</span><span class="sv" id="sc-time">—</span></div>
-          <div class="sc-row" id="sc-maplink-row" style="display:none"><span class="sk">🗺️ The field location</span><span class="sv"><a id="sc-maplink" href="#" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>
+          <div class="sc-row" id="sc-maplink-row" style="display:none"><span class="sk">🗺️ Map</span><span class="sv"><a id="sc-maplink" href="#" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>
         </div>
       </div>
       <button class="btn-primary" onclick="navTo('spots');loadMySpots()">View My Spots →</button>
     </div>
-<div style="padding-bottom: 100px;">
+
     <button class="btn-secondary" id="back-to-games-btn" onclick="showView('games')">← Back to Games</button>
-    <div class="spacer"></div></div>
+    <div class="spacer"></div>
   </div>
 
   <!-- MY SPOTS -->
@@ -655,18 +655,31 @@ async function loadMySpots(){
           '<div class="inline-verify-field" id="'+uid+'-suffixfield"><label>Account Suffix <span style="font-size:10px;color:var(--c-text-3)">(last 8 digits)</span></label><input type="text" id="'+uid+'-suffix" placeholder="12345678" maxlength="8"/></div>'+
           '<button class="inline-verify-btn" id="'+uid+'-btn" onclick="submitInlineVerify(\''+reg.id+'\',\''+uid+'\')">✅ Verify</button></div>';
       }
+      var detailsToggle='';
+      if(reg.status==='approved'){
+        var mapRowHtml=g.mapLink?'<div class="pay-detail-row"><span class="pdl">🗺️ Map</span><span class="pdv"><a href="'+esc(g.mapLink)+'" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>':'';
+        detailsToggle='<button class="pay-toggle-btn" onclick="togglePayDetails(this)">📋 View Details ▾</button>'+
+          '<div class="pay-details">'+
+          (reg.senderName?'<div class="pay-detail-row"><span class="pdl">Sent by</span><span class="pdv">'+esc(reg.senderName)+'</span></div>':'')+
+          '<div class="pay-detail-row"><span class="pdl">Amount Verified</span><span class="pdv">'+(reg.verifiedAmount||reg.totalAmount)+' ETB</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">📍 Location</span><span class="pdv">'+esc(g.location||'—')+'</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">📅 Date</span><span class="pdv">'+fmtDate(g.date)+' · '+fmtDay(g.date)+'</span></div>'+
+          '<div class="pay-detail-row"><span class="pdl">⏰ Time</span><span class="pdv">'+fmtTime(g.time)+'</span></div>'+
+          mapRowHtml+
+          '</div>';
+      }
       var div=document.createElement('div');div.className='reg-card';div.id='regcard-'+reg.id;
       div.innerHTML='<div class="reg-card-top"><div><div class="reg-name">'+esc(g.name||'—')+'</div><div class="reg-game">'+fmtDate(g.date)+' · '+fmtTime(g.time)+'</div></div><span class="status-pill '+pillClass+'">'+pillLabel+'</span></div>'+
         bookingBadge+'<div class="reg-meta"><span>👥 '+reg.playerCount+' player'+(reg.playerCount>1?'s':'')+'</span><span>💰 '+reg.totalAmount+' ETB</span></div>'+
         '<div class="reg-code">'+reg.code+'</div>'+
         (reg.status==='rejected'&&reg.rejectionReason?'<div class="rejection-note">Reason: '+esc(reg.rejectionReason)+'</div>':'')+
-        inlineVerify+payToggle;
+        inlineVerify+payToggle+detailsToggle;
       c.appendChild(div);
     });
   }catch(e){c.innerHTML='<div class="empty"><div class="icon">⚠️</div><p>'+esc(e.message)+'</p></div>';}
 }
 
-function togglePayDetails(btn){var panel=btn.nextElementSibling,isOpen=panel.classList.toggle('open');btn.textContent=isOpen?'💳 Hide Payment Details ▴':'💳 View Payment Details ▾';}
+function togglePayDetails(btn){var panel=btn.nextElementSibling,isOpen=panel.classList.toggle('open');btn.textContent=btn.textContent.replace(isOpen?'▾':'▴',isOpen?'▴':'▾').replace(isOpen?'View':'Hide',isOpen?'Hide':'View');}
 function toggleInlineVerify(btn){var panel=btn.nextElementSibling,isOpen=panel.classList.toggle('open');btn.textContent=isOpen?'✅ Verify Payment Now ▴':'✅ Verify Payment Now ▾';}
 function inlineSelectBank(tabBtn,bank){
   var tabs=tabBtn.parentElement.querySelectorAll('.inline-bank-tab');tabs.forEach(function(t){t.classList.remove('active');});tabBtn.classList.add('active');

@@ -511,7 +511,7 @@ function renderGames(myRegs){
       '<div class="gc-meta"><span>📅 '+fmtDate(g.date)+' · '+fmtDay(g.date)+'</span><span>⏰ '+fmtTime(g.time)+'</span><span>📍 '+esc(g.location.split(',')[0])+'</span><span>👟 '+esc(g.format)+'</span></div>'+
       '<div class="spots-bar"><div class="spots-fill" style="width:0%" data-pct="'+pct+'"></div></div>'+
       '<div class="gc-footer"><div class="gc-price">'+g.pricePerPlayer+' ETB <small>/ player</small></div>'+
-      '<div class="gc-btns"><button class="btn-join"'+(!isOpen||alreadyReg?' disabled':'')+'>'+(alreadyReg?'✓ Registered':isOpen?'Join →':'Closed')+'</button>'+
+      '<div class="gc-btns"><button class="btn-join"'+(!isOpen||alreadyReg?' disabled':'')+'>'+(alreadyReg?'✓ Join':isOpen?'Join →':'Closed')+'</button>'+
       '<button class="btn-monthly"'+(!isOpen||alreadyReg?' disabled':'')+'>📅 Monthly</button></div></div>';
     if(isOpen&&!alreadyReg){
       div.querySelector('.btn-join').addEventListener('click',function(e){e.stopPropagation();openForm(g.id,'single');});

@@ -409,6 +409,7 @@ body{overflow-x:hidden;padding-bottom:160px}
           <div class="sc-row"><span class="sk">📍 Location</span><span class="sv" id="sc-location">—</span></div>
           <div class="sc-row"><span class="sk">📅 Date</span><span class="sv" id="sc-date">—</span></div>
           <div class="sc-row"><span class="sk">⏰ Time</span><span class="sv" id="sc-time">—</span></div>
+          <div class="sc-row" id="sc-maplink-row" style="display:none"><span class="sk">🗺️ Map</span><span class="sv"><a id="sc-maplink" href="#" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>
         </div>
       </div>
       <button class="btn-primary" onclick="navTo('spots');loadMySpots()">View My Spots →</button>
@@ -594,6 +595,7 @@ async function submitVerify(){
   await runVerifyPoll(currentRegId,body,btn,errEl,function(r){
     document.getElementById('verify-form-section').style.display='none';document.getElementById('verify-success-section').style.display='block';document.getElementById('back-to-games-btn').style.display='none';
     document.getElementById('sc-sender').textContent=r.senderName||'—';document.getElementById('sc-amount').textContent=(r.verifiedAmount||'—')+' ETB';document.getElementById('sc-game').textContent=r.game?.name||'—';document.getElementById('sc-location').textContent=r.game?.location||'—';document.getElementById('sc-date').textContent=fmtDate(r.game?.date)+' · '+fmtDay(r.game?.date);document.getElementById('sc-time').textContent=fmtTime(r.game?.time);
+    var mapRow=document.getElementById('sc-maplink-row'),mapA=document.getElementById('sc-maplink');if(r.game?.mapLink){mapA.href=r.game.mapLink;mapRow.style.display='flex';}else{mapRow.style.display='none';}
     loadGames();toast('🎉 Payment verified! Spot confirmed.');if(window.Telegram?.WebApp)Telegram.WebApp.HapticFeedback.notificationOccurred('success');
   },'✅ Confirm Payment');
 }

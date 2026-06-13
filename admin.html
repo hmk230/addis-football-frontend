@@ -281,6 +281,7 @@ td strong{font-weight:600}
             <select id="ng-format"><option>5-a-side</option><option>6-a-side</option><option>7-a-side</option><option>8-a-side</option>
               <option>9-a-side</option><option>10-a-side</option><option>11-a-side</option></select>
           </div>
+          <div class="ff" style="grid-column:1/-1"><label>Google Maps Link</label><input type="text" id="ng-maplink" placeholder="https://maps.app.goo.gl/..."/></div>
         </div>
         <div class="form-actions">
           <button class="create-btn" onclick="saveGame()" id="save-game-btn">+ Add Game</button>
@@ -592,6 +593,7 @@ function openEditGame(gameId) {
   document.getElementById('ng-date').value=g.date; document.getElementById('ng-time').value=g.time;
   document.getElementById('ng-price').value=g.pricePerPlayer; document.getElementById('ng-spots').value=g.maxSpots;
   document.getElementById('ng-format').value=g.format;
+  document.getElementById('ng-maplink').value=g.mapLink||'';
   document.getElementById('game-form-title').textContent='✏️ Edit Game';
   document.getElementById('save-game-btn').textContent='Save Changes';
   document.getElementById('cancel-edit-btn').style.display='inline-block';
@@ -601,7 +603,7 @@ function openEditGame(gameId) {
 
 function cancelEdit() {
   document.getElementById('edit-game-id').value='';
-  ['ng-name','ng-loc','ng-date','ng-time','ng-price','ng-spots'].forEach(function(id){document.getElementById(id).value='';});
+  ['ng-name','ng-loc','ng-date','ng-time','ng-price','ng-spots','ng-maplink'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('ng-format').value='5-a-side';
   document.getElementById('game-form-title').textContent='➕ Add New Game';
   document.getElementById('save-game-btn').textContent='+ Add Game';
@@ -617,8 +619,9 @@ async function saveGame() {
   var price=document.getElementById('ng-price').value;
   var spots=document.getElementById('ng-spots').value;
   var fmt=document.getElementById('ng-format').value;
+  var mapLink=document.getElementById('ng-maplink').value.trim();
   if(!name||!loc||!date||!price||!spots){toast('Fill all required fields');return;}
-  var body={name,location:loc,date,time,pricePerPlayer:+price,format:fmt,maxSpots:+spots};
+  var body={name,location:loc,date,time,pricePerPlayer:+price,format:fmt,maxSpots:+spots,mapLink:mapLink||null};
   var btn=document.getElementById('save-game-btn');
   btn.innerHTML='<div class="spinner" style="border-top-color:#fff"></div>'; btn.disabled=true;
   try {

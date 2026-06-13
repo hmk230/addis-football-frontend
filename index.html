@@ -409,7 +409,7 @@ body{overflow-x:hidden;padding-bottom:160px}
           <div class="sc-row"><span class="sk">📍 Location</span><span class="sv" id="sc-location">—</span></div>
           <div class="sc-row"><span class="sk">📅 Date</span><span class="sv" id="sc-date">—</span></div>
           <div class="sc-row"><span class="sk">⏰ Time</span><span class="sv" id="sc-time">—</span></div>
-          <div class="sc-row" id="sc-maplink-row" style="display:none"><span class="sk">🗺️ Map</span><span class="sv"><a id="sc-maplink" href="#" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>
+          <div class="sc-row" id="sc-maplink-row" style="display:none"><span class="sk">🗺️ The Field Location</span><span class="sv"><a id="sc-maplink" href="#" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>
         </div>
       </div>
       <button class="btn-primary" onclick="navTo('spots');loadMySpots()">View My Spots →</button>
@@ -424,7 +424,7 @@ body{overflow-x:hidden;padding-bottom:160px}
     <div class="page-pad"><div class="page-title">My Spots</div><div class="page-sub">Your registrations and payment status</div></div>
     <div style="padding:0 16px 16px" id="spots-list"><div class="empty"><div class="icon">⏳</div><p>Loading…</p></div></div>
   </div>
-
+<div style="padding-bottom: 100px;"></div>
   <div class="bottom-nav">
     <button class="nav-btn active" id="nav-games" onclick="navTo('games')"><span class="icon">🗓</span>Games</button>
     <button class="nav-btn" id="nav-spots" onclick="navTo('spots');loadMySpots()"><span class="icon">🎟</span>My Spots</button>
@@ -658,7 +658,7 @@ async function loadMySpots(){
       var detailsToggle='';
       if(reg.status==='approved'){
 	  var handle=pi.telegram||'@AddisFootballAdmin',tgUser=handle.replace('@',''),tgMsg='Hello AddisMeetup! My ticket code is '+reg.code+'. I wanna ask .....';
-        var mapRowHtml=g.mapLink?'<div class="pay-detail-row"><span class="pdl">🗺️ The Meetup field</span><span class="pdv"><a href="'+esc(g.mapLink)+'" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>':'';
+        var mapRowHtml=g.mapLink?'<div class="pay-detail-row"><span class="pdl">📍 The Field Location</span><span class="pdv"><a href="'+esc(g.mapLink)+'" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>':'';
         detailsToggle='<button class="verify-toggle-btn" onclick="togglePayDetails(this)">📋 More Details ▾</button>'+
           '<div class="pay-details">'+
           (reg.senderName?'<div class="pay-detail-row"><span class="pdl">Sent by</span><span class="pdv">'+esc(reg.senderName)+'</span></div>':'')+

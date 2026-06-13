@@ -180,26 +180,6 @@ body{overflow-x:hidden;padding-bottom:160px}
 .pay-detail-row .pdv.code{font-family:monospace;letter-spacing:.5px;color:var(--c-green)}
 .pay-tg-btn{display:block;width:100%;margin-top:8px;padding:9px;background:#2BA5E0;color:#fff;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:'Inter',sans-serif;text-decoration:none;text-align:center}
 
-/* ── INLINE VERIFY (My Spots) ── */
-.inline-verify{margin-top:10px;background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:12px;display:none}
-.inline-verify.open{display:block}
-.inline-verify-title{font-size:12px;font-weight:700;color:var(--c-text);margin-bottom:10px}
-.inline-bank-tabs{display:flex;gap:3px;background:#e5e7eb;border-radius:8px;padding:2px;margin-bottom:10px}
-.inline-bank-tab{flex:1;padding:6px;text-align:center;font-size:11px;font-weight:600;color:var(--c-text-3);cursor:pointer;border-radius:6px;border:none;background:none;font-family:'Inter',sans-serif;transition:all .15s}
-.inline-bank-tab.active{background:var(--c-surface);color:var(--c-text);box-shadow:var(--shadow)}
-.inline-verify-field{margin-bottom:8px}
-.inline-verify-field label{display:block;font-size:11px;font-weight:600;color:var(--c-text-2);margin-bottom:4px}
-.inline-verify-field input{display:block;width:100%;padding:9px 12px;background:var(--c-surface);border:1.5px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--c-text);outline:none;transition:border-color .15s}
-.inline-verify-field input:focus{border-color:var(--c-border-focus)}
-.inline-verify-field input::placeholder{color:var(--c-text-3)}
-.inline-verify-err{font-size:12px;color:var(--c-red);background:var(--c-red-light);border:1px solid #fecaca;border-radius:6px;padding:8px 10px;margin-bottom:8px;display:none}
-.inline-verify-err.show{display:block}
-.inline-verify-btn{display:block;width:100%;padding:10px;background:var(--c-green);color:#fff;font-size:13px;font-weight:600;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
-.inline-verify-btn:hover{background:var(--c-green-dark)}
-.inline-verify-btn:disabled{background:var(--c-border);color:var(--c-text-3);cursor:not-allowed}
-.verify-toggle-btn{display:block;width:100%;margin-top:8px;padding:9px 14px;background:var(--c-green-light);color:var(--c-green-dark);font-size:12px;font-weight:600;border:1px solid var(--c-green-mid);border-radius:var(--radius-sm);cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:background .15s}
-.verify-toggle-btn:hover{background:var(--c-green-mid)}
-
 /* ── AUTH ── */
 .auth-screen{min-height:100vh;background:var(--c-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px}
 .auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
@@ -431,12 +411,12 @@ body{overflow-x:hidden;padding-bottom:160px}
         </div>
         <div class="verify-err" id="verify-err"></div>
         <div class="verify-field">
-          <label id="ref-label">Reference Number</label>
-          <input type="text" id="v-ref" placeholder="e.g. FT1234567890"/>
+          <label id="ref-label">Reference / Transaction Number</label>
+          <input type="text" id="v-ref" placeholder="e.g. FT1234567890 or DET8FJGUJ4"/>
         </div>
-        <div class="verify-field" id="suffix-field">
-          <label>Account Suffix <span style="font-size:11px;color:var(--c-text-3)">(last 8 digits of your CBE account)</span></label>
-          <input type="text" id="v-suffix" placeholder="12345678" maxlength="8"/>
+        <div class="verify-field" id="suffix-field" style="display:block">
+          <label>Your CBE Account Suffix <span style="font-size:11px;color:var(--c-text-3)">(last 8 digits of your account)</span></label>
+          <input type="text" id="v-suffix" placeholder="81055177" maxlength="8" inputmode="numeric"/>
         </div>
         <button class="verify-btn" id="verify-btn" onclick="submitVerify()">✅ Verify Payment</button>
       </div>
@@ -780,7 +760,7 @@ async function submitReg() {
     document.getElementById('back-to-games-btn').style.display      = 'block';
     document.getElementById('verify-err').classList.remove('show');
     document.getElementById('v-ref').value    = '';
-    document.getElementById('v-suffix').value = '';
+    if (document.getElementById('v-suffix')) document.getElementById('v-suffix').value = '';
     selectBank('cbe');
 
     // Ticket
@@ -813,14 +793,13 @@ async function submitReg() {
   } finally { btn.disabled = false; btn.textContent = 'Reserve Spots'; }
 }
 
-/* ── VERIFY PAYMENT (payment view) ── */
+/* ── VERIFY PAYMENT ── */
 function selectBank(bank) {
   selectedBank = bank;
   document.getElementById('btab-cbe').classList.toggle('active',      bank === 'cbe');
   document.getElementById('btab-telebirr').classList.toggle('active', bank === 'telebirr');
   document.getElementById('suffix-field').style.display = bank === 'cbe' ? 'block' : 'none';
-  document.getElementById('ref-label').textContent      = bank === 'telebirr' ? 'Transaction Number' : 'Reference Number';
-  document.getElementById('v-ref').placeholder          = bank === 'telebirr' ? 'e.g. DET8FJGUJ4' : 'e.g. FT1234567890';
+  document.getElementById('v-ref').placeholder = bank === 'telebirr' ? 'e.g. DET8FJGUJ4' : 'e.g. FT1234567890';
 }
 
 async function submitVerify() {
@@ -830,80 +809,39 @@ async function submitVerify() {
   var suffix = document.getElementById('v-suffix').value.trim();
   errEl.classList.remove('show');
   if (!ref) { errEl.textContent = 'Please enter your reference number.'; errEl.classList.add('show'); return; }
-  if (selectedBank === 'cbe' && suffix.length !== 8) { errEl.textContent = 'CBE account suffix must be exactly 8 digits.'; errEl.classList.add('show'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> Verifying…';
-
-  var body = { bank: selectedBank, referenceNumber: ref };
-  if (selectedBank === 'cbe') body.accountSuffix = suffix;
-
-  await runVerifyPoll(currentRegId, body, btn, errEl, function(r) {
-    // success callback
+  if (selectedBank === 'cbe' && suffix.replace(/\D/g,'').length !== 8) {
+    errEl.textContent = 'Please enter your 8-digit CBE account suffix.'; errEl.classList.add('show'); return;
+  }
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Verifying…';
+  try {
+    var body = { bank: selectedBank, referenceNumber: ref };
+    if (selectedBank === 'cbe') body.accountSuffix = suffix;
+    var r = await apiFetch(API + '/api/verify-payment/' + currentRegId, 'POST', body);
     document.getElementById('verify-form-section').style.display    = 'none';
     document.getElementById('verify-success-section').style.display = 'block';
     document.getElementById('back-to-games-btn').style.display      = 'none';
-    document.getElementById('sc-sender').textContent   = r.senderName        || '—';
-    document.getElementById('sc-amount').textContent   = (r.verifiedAmount   || '—') + ' ETB';
-    document.getElementById('sc-game').textContent     = r.game?.name        || '—';
-    document.getElementById('sc-location').textContent = r.game?.location    || '—';
+    document.getElementById('sc-sender').textContent   = r.senderName         || '—';
+    document.getElementById('sc-amount').textContent   = (r.verifiedAmount || '—') + ' ETB';
+    document.getElementById('sc-game').textContent     = r.game?.name         || '—';
+    document.getElementById('sc-location').textContent = r.game?.location      || '—';
     document.getElementById('sc-date').textContent     = fmtDate(r.game?.date) + ' · ' + fmtDay(r.game?.date);
     document.getElementById('sc-time').textContent     = fmtTime(r.game?.time);
-    loadGames();
+    await loadGames();
     toast('🎉 Payment verified! Spot confirmed.');
     if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-  }, '✅ Verify Payment');
-}
-
-/* ── SHARED VERIFY POLL LOGIC ── */
-async function runVerifyPoll(regId, body, btn, errEl, onSuccess, btnLabel) {
-  var maxAttempts = 10;
-  var attempt = 0;
-
-  async function tryVerify() {
-    attempt++;
-    try {
-      var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
-      if (token) opts.headers['Authorization'] = 'Bearer ' + token;
-      opts.body = JSON.stringify(body);
-
-      var res  = await fetch(API + '/api/verify-payment/' + regId, opts);
-      var data = await res.json();
-
-      // Still processing — retry
-      if (res.status === 202 && data.pending) {
-        if (attempt >= maxAttempts) {
-          btn.disabled = false;
-          btn.textContent = btnLabel;
-          errEl.textContent = 'Verification is taking longer than expected. Please try again in a moment.';
-          errEl.classList.add('show');
-          return;
-        }
-        var secs = (maxAttempts - attempt) * 3;
-        btn.innerHTML = '<div class="spinner"></div> Processing… (' + secs + 's)';
-        setTimeout(tryVerify, 3000);
-        return;
-      }
-
-      // Error response
-      if (!res.ok) {
-        throw new Error(data.error || 'Request failed');
-      }
-
-      // ✅ Success
-      btn.disabled = false;
-      btn.textContent = btnLabel;
-      onSuccess(data);
-
-    } catch(e) {
-      btn.disabled = false;
-      btn.textContent = btnLabel;
-      errEl.textContent = e.message;
-      errEl.classList.add('show');
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.classList.add('show');
+    // If reservation was cancelled on backend, redirect back to games after 3s
+    if (e.cancelled) {
+      setTimeout(function() {
+        currentRegId = null;
+        showView('games');
+        loadGames();
+      }, 3000);
     }
   }
-
-  tryVerify();
+  finally { btn.disabled = false; btn.textContent = '✅ Verify Payment'; }
 }
 
 /* ── MY SPOTS ── */
@@ -926,7 +864,6 @@ async function loadMySpots() {
       var bookingBadge = isMonthly
         ? '<span class="booking-badge monthly">📅 Monthly – 4 weeks</span>'
         : '<span class="booking-badge single">Single</span>';
-
       var payToggle = '';
       if (isPending && pi) {
         var handle = pi.telegram || '@AddisFootballAdmin';
@@ -944,36 +881,8 @@ async function loadMySpots() {
             '<a class="pay-tg-btn" href="https://t.me/' + tgUser + '?text=' + encodeURIComponent(tgMsg) + '" target="_blank">📩 Open Telegram</a>' +
           '</div>';
       }
-
-      // Inline verify button for pending registrations
-      var inlineVerify = '';
-      if (isPending) {
-        var uid = 'iv-' + reg.id.replace(/-/g,'');
-        inlineVerify =
-          '<button class="verify-toggle-btn" onclick="toggleInlineVerify(this)">✅ Verify Payment Now ▾</button>' +
-          '<div class="inline-verify" id="' + uid + '">' +
-            '<div class="inline-verify-title">Enter your payment reference</div>' +
-            '<div class="inline-bank-tabs">' +
-              '<button class="inline-bank-tab active" onclick="inlineSelectBank(this,\'cbe\')">🏦 CBE</button>' +
-              '<button class="inline-bank-tab"        onclick="inlineSelectBank(this,\'telebirr\')">📱 Telebirr</button>' +
-            '</div>' +
-            '<div class="inline-verify-err" id="' + uid + '-err"></div>' +
-            '<div class="inline-verify-field">' +
-              '<label id="' + uid + '-reflabel">Reference Number</label>' +
-              '<input type="text" id="' + uid + '-ref" placeholder="e.g. FT1234567890"/>' +
-            '</div>' +
-            '<div class="inline-verify-field" id="' + uid + '-suffixfield">' +
-              '<label>Account Suffix <span style="font-size:10px;color:var(--c-text-3)">(last 8 digits)</span></label>' +
-              '<input type="text" id="' + uid + '-suffix" placeholder="12345678" maxlength="8"/>' +
-            '</div>' +
-            '<button class="inline-verify-btn" id="' + uid + '-btn" ' +
-              'onclick="submitInlineVerify(\'' + reg.id + '\',\'' + uid + '\')">✅ Verify</button>' +
-          '</div>';
-      }
-
       var div = document.createElement('div');
       div.className = 'reg-card';
-      div.id = 'regcard-' + reg.id;
       div.innerHTML =
         '<div class="reg-card-top">' +
           '<div><div class="reg-name">' + esc(g.name||'—') + '</div><div class="reg-game">' + fmtDate(g.date) + ' · ' + fmtTime(g.time) + '</div></div>' +
@@ -983,7 +892,6 @@ async function loadMySpots() {
         '<div class="reg-meta"><span>👥 ' + reg.playerCount + ' player' + (reg.playerCount>1?'s':'') + '</span><span>💰 ' + reg.totalAmount + ' ETB</span></div>' +
         '<div class="reg-code">' + reg.code + '</div>' +
         (reg.status==='rejected'&&reg.rejectionReason ? '<div class="rejection-note">Reason: ' + esc(reg.rejectionReason) + '</div>' : '') +
-        inlineVerify +
         payToggle;
       c.appendChild(div);
     });
@@ -994,67 +902,6 @@ function togglePayDetails(btn) {
   var panel = btn.nextElementSibling;
   var isOpen = panel.classList.toggle('open');
   btn.textContent = isOpen ? '💳 Hide Payment Details ▴' : '💳 View Payment Details ▾';
-}
-
-function toggleInlineVerify(btn) {
-  var panel = btn.nextElementSibling;
-  var isOpen = panel.classList.toggle('open');
-  btn.textContent = isOpen ? '✅ Verify Payment Now ▴' : '✅ Verify Payment Now ▾';
-}
-
-function inlineSelectBank(tabBtn, bank) {
-  var tabs = tabBtn.parentElement.querySelectorAll('.inline-bank-tab');
-  tabs.forEach(function(t) { t.classList.remove('active'); });
-  tabBtn.classList.add('active');
-  // find uid prefix from parent inline-verify div
-  var panel  = tabBtn.closest('.inline-verify');
-  var uid    = panel.id;
-  var suffix = document.getElementById(uid + '-suffixfield');
-  var refLbl = document.getElementById(uid + '-reflabel');
-  var refInp = document.getElementById(uid + '-ref');
-  if (suffix) suffix.style.display = bank === 'cbe' ? 'block' : 'none';
-  if (refLbl) refLbl.textContent   = bank === 'telebirr' ? 'Transaction Number' : 'Reference Number';
-  if (refInp) refInp.placeholder   = bank === 'telebirr' ? 'e.g. DET8FJGUJ4' : 'e.g. FT1234567890';
-}
-
-async function submitInlineVerify(regId, uid) {
-  var errEl  = document.getElementById(uid + '-err');
-  var btn    = document.getElementById(uid + '-btn');
-  var ref    = (document.getElementById(uid + '-ref')?.value || '').trim();
-  var suffix = (document.getElementById(uid + '-suffix')?.value || '').trim();
-  var panel  = document.getElementById(uid);
-
-  // Detect selected bank from active tab
-  var activeTab = panel.querySelector('.inline-bank-tab.active');
-  var bank = activeTab && activeTab.textContent.includes('Telebirr') ? 'telebirr' : 'cbe';
-
-  errEl.classList.remove('show');
-  if (!ref) { errEl.textContent = 'Please enter your reference number.'; errEl.classList.add('show'); return; }
-  if (bank === 'cbe' && suffix.length !== 8) { errEl.textContent = 'CBE account suffix must be exactly 8 digits.'; errEl.classList.add('show'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> Verifying…';
-
-  var body = { bank: bank, referenceNumber: ref };
-  if (bank === 'cbe') body.accountSuffix = suffix;
-
-  await runVerifyPoll(regId, body, btn, errEl, function(r) {
-    // Success — update card to confirmed without full reload
-    var card = document.getElementById('regcard-' + regId);
-    if (card) {
-      var pill = card.querySelector('.status-pill');
-      if (pill) { pill.className = 'status-pill pill-approved'; pill.textContent = '✓ Confirmed'; }
-      var ivBtn = card.querySelector('.verify-toggle-btn');
-      if (ivBtn) ivBtn.remove();
-      if (panel) panel.remove();
-      var payToggleBtn = card.querySelector('.pay-toggle-btn');
-      if (payToggleBtn) { payToggleBtn.remove(); }
-      var payDetails = card.querySelector('.pay-details');
-      if (payDetails) payDetails.remove();
-    }
-    toast('🎉 Payment verified! Spot confirmed.');
-    if (window.Telegram?.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-  }, '✅ Verify');
 }
 
 /* ── NAV ── */
@@ -1085,7 +932,9 @@ async function apiFetch(url, method, body, auth) {
   var res  = await fetch(url, opts);
   var data = await res.json();
   if (!res.ok) {
-    throw new Error(data.error || 'Request failed');
+    var err = new Error(data.error || 'Request failed');
+    if (data.cancelled) err.cancelled = true;
+    throw err;
   }
   return data;
 }

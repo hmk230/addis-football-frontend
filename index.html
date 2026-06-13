@@ -486,32 +486,34 @@ async function submitChangePassword(){
 async function loadGames(){
   try{
     var r=await apiFetch(API+'/api/games','GET',null,false);gamesData=r.games;
-    var myRegs=[];
-    if(token){try{var mr=await apiFetch(API+'/api/registrations/my','GET');myRegs=(mr.registrations||[]).filter(function(r){return r.status!=='rejected';}).map(function(r){return r.gameId;});}catch{myRegs=[];}}
+    var myRegs={};
+    if(token){try{var mr=await apiFetch(API+'/api/registrations/my','GET');(mr.registrations||[]).filter(function(r){return r.status!=='rejected';}).forEach(function(r){myRegs[r.gameId]=r.status;});}catch{myRegs={};}}
     renderGames(myRegs);
   }catch{document.getElementById('games-list').innerHTML='<div class="empty"><div class="icon">📡</div><p>Could not load games.</p></div>';}
 }
 
 function renderGames(myRegs){
-  myRegs=myRegs||[];
+  myRegs=myRegs||{};
   var c=document.getElementById('games-list');
   if(!gamesData.length){c.innerHTML='<div class="empty"><div class="icon">📅</div><p>No games scheduled yet.</p></div>';return;}
   c.innerHTML='';
   var sorted=[...gamesData].sort(function(a,b){return new Date(b.createdAt)-new Date(a.createdAt);});
   sorted.forEach(function(g){
-    var pct=Math.min(100,(g.approvedSpots/g.maxSpots)*100),spotsLeft=g.spotsLeft,isOpen=g.registrationOpen&&spotsLeft>0,alreadyReg=myRegs.includes(g.id),isFew=isOpen&&spotsLeft<=4;
+    var pct=Math.min(100,(g.approvedSpots/g.maxSpots)*100),spotsLeft=g.spotsLeft,isOpen=g.registrationOpen&&spotsLeft>0,regStatus=myRegs[g.id],alreadyReg=!!regStatus,isFew=isOpen&&spotsLeft<=4;
     var badgeHtml,badgeClass;
     if(!g.registrationOpen){badgeHtml='Registration Closed';badgeClass='badge-closed';}
     else if(spotsLeft<=0){badgeHtml='Full';badgeClass='badge-full';}
     else if(isFew){badgeHtml=spotsLeft+' spots left';badgeClass='badge-few';}
     else{badgeHtml=spotsLeft+' spots left';badgeClass='badge-open';}
+    var joinLabel=isOpen?'Join →':'Closed';
+    if(alreadyReg){joinLabel=regStatus==='approved'?'✓ Registered':'⏳ Pending';}
     var div=document.createElement('div');
     div.className='game-card'+(isOpen?'':' closed');
     div.innerHTML='<div class="gc-top"><div class="gc-name">'+esc(g.name)+'</div><span class="gc-badge '+badgeClass+'">'+badgeHtml+'</span></div>'+
       '<div class="gc-meta"><span>📅 '+fmtDate(g.date)+' · '+fmtDay(g.date)+'</span><span>⏰ '+fmtTime(g.time)+'</span><span>📍 '+esc(g.location.split(',')[0])+'</span><span>👟 '+esc(g.format)+'</span></div>'+
       '<div class="spots-bar"><div class="spots-fill" style="width:0%" data-pct="'+pct+'"></div></div>'+
       '<div class="gc-footer"><div class="gc-price">'+g.pricePerPlayer+' ETB <small>/ player</small></div>'+
-      '<div class="gc-btns"><button class="btn-join"'+(!isOpen||alreadyReg?' disabled':'')+'>'+(alreadyReg?'✓ Join':isOpen?'Join →':'Closed')+'</button>'+
+      '<div class="gc-btns"><button class="btn-join"'+(!isOpen||alreadyReg?' disabled':'')+'>'+joinLabel+'</button>'+
       '<button class="btn-monthly"'+(!isOpen||alreadyReg?' disabled':'')+'>📅 Monthly</button></div></div>';
     if(isOpen&&!alreadyReg){
       div.querySelector('.btn-join').addEventListener('click',function(e){e.stopPropagation();openForm(g.id,'single');});

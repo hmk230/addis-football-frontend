@@ -645,8 +645,7 @@ async function loadMySpots(){
           '<div class="pay-detail-row"><span class="pdl">Account No.</span><span class="pdv">'+esc(pi.accountNumber)+'</span></div>'+
           '<div class="pay-detail-row"><span class="pdl">Telebirr</span><span class="pdv">'+esc(pi.telebirr)+'</span></div>'+
           '<div class="pay-detail-row"><span class="pdl">Amount</span><span class="pdv" style="color:var(--c-green)">'+reg.totalAmount+' ETB</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">Reference</span><span class="pdv code">'+esc(reg.code)+'</span></div>'+
-          '<a class="pay-tg-btn" href="https://t.me/'+tgUser+'?text='+encodeURIComponent(tgMsg)+'" target="_blank">📩 Open Telegram</a></div>';
+          '<div class="pay-detail-row"><span class="pdl">Reference</span><span class="pdv code">'+esc(reg.code)+'</span></div>'+</div>';
       }
       var div=document.createElement('div');div.className='reg-card';div.id='regcard-'+reg.id;
       div.innerHTML='<div class="reg-card-top"><div><div class="reg-name">'+esc(g.name||'—')+'</div><div class="reg-game">'+fmtDate(g.date)+' · '+fmtTime(g.time)+'</div></div><span class="status-pill '+pillClass+'">'+pillLabel+'</span></div>'+

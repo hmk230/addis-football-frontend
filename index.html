@@ -657,15 +657,12 @@ async function loadMySpots(){
       }
       var detailsToggle='';
       if(reg.status==='approved'){
-        var mapRowHtml=g.mapLink?'<div class="pay-detail-row"><span class="pdl">🗺️ Map</span><span class="pdv"><a href="'+esc(g.mapLink)+'" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>':'';
+        var mapRowHtml=g.mapLink?'<div class="pay-detail-row"><span class="pdl">🗺️ The Meetup field</span><span class="pdv"><a href="'+esc(g.mapLink)+'" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>':'';
         detailsToggle='<button class="pay-toggle-btn" onclick="togglePayDetails(this)">📋 View Details ▾</button>'+
           '<div class="pay-details">'+
           (reg.senderName?'<div class="pay-detail-row"><span class="pdl">Sent by</span><span class="pdv">'+esc(reg.senderName)+'</span></div>':'')+
-          '<div class="pay-detail-row"><span class="pdl">Amount Verified</span><span class="pdv">'+(reg.verifiedAmount||reg.totalAmount)+' ETB</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">📍 Location</span><span class="pdv">'+esc(g.location||'—')+'</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">📅 Date</span><span class="pdv">'+fmtDate(g.date)+' · '+fmtDay(g.date)+'</span></div>'+
-          '<div class="pay-detail-row"><span class="pdl">⏰ Time</span><span class="pdv">'+fmtTime(g.time)+'</span></div>'+
-          mapRowHtml+
+           '<div class="pay-detail-row"><span class="pdl">📍 Location</span><span class="pdv">'+esc(g.location||'—')+'</span></div>'+
+          mapRowHtml+'<a class="pay-tg-btn" href="https://t.me/'+tgUser+'?text='+encodeURIComponent(tgMsg)+'" target="_blank">📩 Open Telegram</a></div>';
           '</div>';
       }
       var div=document.createElement('div');div.className='reg-card';div.id='regcard-'+reg.id;

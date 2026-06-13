@@ -658,7 +658,7 @@ async function loadMySpots(){
       var detailsToggle='';
       if(reg.status==='approved'){
         var mapRowHtml=g.mapLink?'<div class="pay-detail-row"><span class="pdl">🗺️ The Meetup field</span><span class="pdv"><a href="'+esc(g.mapLink)+'" target="_blank" rel="noopener" style="color:var(--c-green);font-weight:600;text-decoration:none">Open in Google Maps →</a></span></div>':'';
-        detailsToggle='<button class="pay-toggle-btn" onclick="togglePayDetails(this)">📋 View Details ▾</button>'+
+        detailsToggle='<button class="verify-toggle-btn" onclick="togglePayDetails(this)">📋 More Details ▾</button>'+
           '<div class="pay-details">'+
           (reg.senderName?'<div class="pay-detail-row"><span class="pdl">Sent by</span><span class="pdv">'+esc(reg.senderName)+'</span></div>':'')+
            '<div class="pay-detail-row"><span class="pdl">📍 Location</span><span class="pdv">'+esc(g.location||'—')+'</span></div>'+
